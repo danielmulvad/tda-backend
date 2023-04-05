@@ -5,9 +5,10 @@ WORKDIR /usr/src/tda-server
 
 RUN --mount=type=bind,target=. \
   --mount=type=secret,id=PRIVATE_CERTIFICATE_CERT \
-  --mount=type=secret,id=PRIVATE_CERTIFICATE_KEY \
-  echo "$PRIVATE_CERTIFICATE_CERT" > ./self_signed_certs/cert.pem && \
-    echo "$PRIVATE_CERTIFICATE_KEY" > ./self_signed_certs/key.pem
+  --mount=type=secret,id=PRIVATE_CERTIFICATE_KEY
+
+RUN cat /run/secrets/PRIVATE_CERTIFICATE_CERT > ./self_signed_certs/cert.pem
+RUN cat /run/secrets/PRIVATE_CERTIFICATE_KEY > ./self_signed_certs/key.pem
 
 COPY ./Cargo.toml ./Cargo.toml
 COPY ./Cargo.lock ./Cargo.lock
