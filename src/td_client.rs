@@ -1,6 +1,7 @@
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::env;
+use url::form_urlencoded;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct TokenResponse {
@@ -38,7 +39,16 @@ impl Default for TDAmeritradeClient {
 
 impl TDAmeritradeClient {
     pub fn new() -> Self {
-        let client = Client::new();
+        let client = match Client::builder()
+            .add_root_certificate(
+                reqwest::Certificate::from_pem(include_bytes!("../self_signed_certs/cert.pem"))
+                    .unwrap(),
+            )
+            .build()
+        {
+            Ok(client) => client,
+            Err(e) => panic!("Error building client: {:?}", e),
+        };
         let base_url = "https://api.tdameritrade.com/v1".to_string();
         let api_key = env::var("TDA_API_KEY").expect("TDA_API_KEY not found in .env");
 
@@ -54,16 +64,14 @@ impl TDAmeritradeClient {
         code: &str,
     ) -> Result<TokenResponse, reqwest::Error> {
         let url = format!("{}/oauth2/token", self.base_url);
-
+        let redirect_uri =
+            env::var("TDA_API_CALLBACK_URL").expect("TDA_API_CALLBACK_URL not found in .env");
         let params = [
             ("grant_type", "authorization_code"),
             ("access_type", "offline"),
             ("code", code),
             ("client_id", &self.api_key),
-            (
-                "redirect_uri",
-                "https://localhost:3000/api/auth/callback/tda",
-            ),
+            ("redirect_uri", redirect_uri.as_str()),
         ];
 
         let res = self.client.post(&url).form(&params).send().await;
@@ -85,7 +93,11 @@ impl TDAmeritradeClient {
 
     pub fn get_authorization_url(&self) -> String {
         let client_id = &self.api_key;
-        let redirect_uri = "https%3A%2F%2Flocalhost%3A3000%2Fapi%2Fauth%2Fcallback%2Ftda";
+        let callback_url =
+            env::var("TDA_API_CALLBACK_URL").expect("TDA_API_CALLBACK_URL not found in .env");
+        let redirect_uri =
+            form_urlencoded::byte_serialize(callback_url.as_bytes()).collect::<String>();
+        println!("redirect_uri: {:?}", redirect_uri);
         let base_url = "https://auth.tdameritrade.com/auth";
         let response_type = "code";
         let scope = "AccountAccess";

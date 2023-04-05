@@ -1,5 +1,5 @@
 [package]
-name = "tda-stack"
+name = "tda-server"
 version = "0.1.0"
 edition = "2021"
 
@@ -10,7 +10,6 @@ axum-test = { version = "7.0" }
 axum = { version = "0.6", features = ["http2", "query"] }
 axum-macros = { version = "0.3" }
 axum-server = { version = "0.4", features = ["tls-rustls"] }
-chrono = { version = "0.4" }
 cookie = { version = "0.17" }
 dotenv = { version = "0.15" }
 hyper = { version = "0.14", features = ["full"] }
@@ -20,3 +19,4 @@ tokio = { version = "1.26", features = ["full"] }
 tower = { version = "0.4" }
 tracing = { version = "0.1" }
 tracing-subscriber = { version = "0.3" }
+url = { version = "2.3" }

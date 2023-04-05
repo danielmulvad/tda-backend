@@ -10,6 +10,9 @@
 !.env
 !.gitignore
 
+# Other Files
+!Dockerfile
+
 # Dependencies
 !Cargo.toml
 !Cargo.lock
