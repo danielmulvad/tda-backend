@@ -20,7 +20,6 @@ RUN --mount=type=bind,target=. \
     echo "$PRIVATE_CERTIFICATE_KEY" > ./self_signed_certs/key.pem
 
 COPY .env ./.env
-COPY ./self_signed_certs/ ./self_signed_certs/
 RUN apt update && apt install pkg-config openssl libssl-dev ca-certificates -y
 
 EXPOSE 3000
