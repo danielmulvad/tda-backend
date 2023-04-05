@@ -52,6 +52,10 @@ pub async fn auth_callback_tda(
         Ok(token_response) => {
             access_token.set_same_site(SameSite::Lax);
             refresh_token.set_same_site(SameSite::Lax);
+            access_token.set_domain(base_url_host);
+            refresh_token.set_domain(base_url_host);
+            access_token.set_path("/");
+            refresh_token.set_path("/");
             access_token.set_value(token_response.access_token);
             refresh_token.set_value(token_response.refresh_token);
             if base_url_host == "localhost" {
