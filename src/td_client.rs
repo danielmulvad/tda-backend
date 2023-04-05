@@ -97,7 +97,6 @@ impl TDAmeritradeClient {
             env::var("TDA_API_CALLBACK_URL").expect("TDA_API_CALLBACK_URL not found in .env");
         let redirect_uri =
             form_urlencoded::byte_serialize(callback_url.as_bytes()).collect::<String>();
-        println!("redirect_uri: {:?}", redirect_uri);
         let base_url = "https://auth.tdameritrade.com/auth";
         let response_type = "code";
         let scope = "AccountAccess";

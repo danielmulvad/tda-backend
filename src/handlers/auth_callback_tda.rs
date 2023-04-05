@@ -3,7 +3,10 @@ use axum::{
     extract::{Query, State},
     response::{AppendHeaders, IntoResponse, Redirect},
 };
-use cookie::{time::OffsetDateTime, Cookie, Expiration};
+use cookie::{
+    time::{Duration, OffsetDateTime},
+    Cookie, Expiration,
+};
 use hyper::header::SET_COOKIE;
 use std::env;
 
@@ -51,17 +54,20 @@ pub async fn auth_callback_tda(
     let token_response = state.td_client.exchange_code_for_token(code).await;
     match token_response {
         Ok(token_response) => {
-            let mut now = OffsetDateTime::now_utc();
-            let expires_in = match token_response.expires_in.try_into() {
-                Ok(expires_in) => expires_in,
-                Err(_e) => 0,
-            };
-            now += cookie::time::Duration::seconds(expires_in);
+            let now = OffsetDateTime::now_utc();
             access_token.set_value(token_response.access_token);
             access_token.set_expires(now);
             refresh_token.set_value(token_response.refresh_token);
             refresh_token.set_expires(now);
             if base_url_host != "localhost" {
+                let access_token_expires = OffsetDateTime::now_utc()
+                    .checked_add(Duration::minutes(30))
+                    .unwrap();
+                let refresh_token_expires = OffsetDateTime::now_utc()
+                    .checked_add(Duration::days(90))
+                    .unwrap();
+                access_token.set_expires(Expiration::DateTime(access_token_expires));
+                refresh_token.set_expires(Expiration::DateTime(refresh_token_expires));
                 access_token.set_domain(base_url_host);
                 refresh_token.set_domain(base_url_host);
                 access_token.set_secure(true);
