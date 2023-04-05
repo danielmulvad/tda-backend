@@ -7,6 +7,7 @@ RUN --mount=type=bind,target=. \
   --mount=type=secret,id=PRIVATE_CERTIFICATE_CERT \
   --mount=type=secret,id=PRIVATE_CERTIFICATE_KEY
 
+RUN mkdir ./self_signed_certs
 RUN cat /run/secrets/PRIVATE_CERTIFICATE_CERT > ./self_signed_certs/cert.pem
 RUN cat /run/secrets/PRIVATE_CERTIFICATE_KEY > ./self_signed_certs/key.pem
 
