@@ -32,10 +32,6 @@ pub async fn auth_callback_tda(
 ) -> impl IntoResponse {
     let mut access_token = Cookie::new("access_token", "");
     let mut refresh_token = Cookie::new("refresh_token", "");
-    let now_expiration = Expiration::DateTime(OffsetDateTime::now_utc());
-    access_token.set_expires(now_expiration);
-    refresh_token.set_expires(now_expiration);
-
     let base_url = get_base_url();
     let base_url_host = match base_url.host_str() {
         Some(host_str) => host_str,
@@ -55,11 +51,12 @@ pub async fn auth_callback_tda(
     match token_response {
         Ok(token_response) => {
             let now = OffsetDateTime::now_utc();
-            access_token.set_value(token_response.access_token);
-            access_token.set_expires(now);
-            refresh_token.set_value(token_response.refresh_token);
-            refresh_token.set_expires(now);
-            if base_url_host != "localhost" {
+            if base_url_host == "localhost" {
+                access_token.set_value(token_response.access_token);
+                access_token.set_expires(now);
+                refresh_token.set_value(token_response.refresh_token);
+                refresh_token.set_expires(now);
+            } else {
                 let access_token_expires = OffsetDateTime::now_utc()
                     .checked_add(Duration::minutes(30))
                     .unwrap();
