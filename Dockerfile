@@ -3,12 +3,9 @@ FROM rust:1.68-slim as builder
 
 WORKDIR /usr/src/tda-server
 
-RUN --mount=type=secret,id=PRIVATE_CERTIFICATE_CERT \
-  --mount=type=secret,id=PRIVATE_CERTIFICATE_KEY
-
 RUN mkdir ./self_signed_certs
-RUN cat /run/secrets/PRIVATE_CERTIFICATE_CERT > ./self_signed_certs/cert.pem
-RUN cat /run/secrets/PRIVATE_CERTIFICATE_KEY > ./self_signed_certs/key.pem
+RUN --mount=type=secret,id=PRIVATE_CERTIFICATE_CERT cat /run/secrets/PRIVATE_CERTIFICATE_CERT > ./self_signed_certs/cert.pem
+RUN --mount=type=secret,id=PRIVATE_CERTIFICATE_KEY cat /run/secrets/PRIVATE_CERTIFICATE_KEY > ./self_signed_certs/key.pem
 
 COPY ./Cargo.toml ./Cargo.toml
 COPY ./Cargo.lock ./Cargo.lock
