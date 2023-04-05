@@ -2,6 +2,8 @@
 *
 
 # Folders
+!.github/
+!.github/**
 !self_signed_certs/
 !src/
 !src/**
