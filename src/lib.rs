@@ -12,5 +12,6 @@ impl Default for AppState {
 }
 
 pub mod handlers;
+pub mod router;
 pub mod server;
 pub mod td_client;

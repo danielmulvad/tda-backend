@@ -4,11 +4,11 @@ use std::env;
 
 #[derive(Debug, Deserialize, Serialize)]
 pub struct TokenResponse {
-    access_token: String,
-    token_type: String,
-    expires_in: u64,
-    refresh_token: String,
-    scope: String,
+    pub access_token: String,
+    pub token_type: String,
+    pub expires_in: u64,
+    pub refresh_token: String,
+    pub scope: String,
 }
 
 impl Default for TokenResponse {
@@ -66,16 +66,21 @@ impl TDAmeritradeClient {
             ),
         ];
 
-        let res = self
-            .client
-            .post(&url)
-            .form(&params)
-            .send()
-            .await?
-            .json::<TokenResponse>()
-            .await?;
-
-        Ok(res)
+        let res = self.client.post(&url).form(&params).send().await;
+        let json = match res {
+            Ok(res) => res.json::<TokenResponse>().await,
+            Err(e) => {
+                println!("error: {:?}", e);
+                Err(e)
+            }
+        };
+        match json {
+            Ok(json) => Ok(json),
+            Err(e) => {
+                println!("error: {:?}", e);
+                Err(e)
+            }
+        }
     }
 
     pub fn get_authorization_url(&self) -> String {

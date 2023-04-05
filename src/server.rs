@@ -1,13 +1,11 @@
+use crate::router::Router;
 use axum::{
     extract::Host, handler::HandlerWithoutStateExt, http::StatusCode, http::Uri,
-    response::Redirect, routing::get, BoxError, Router,
+    response::Redirect, BoxError,
 };
 use axum_server::tls_rustls::RustlsConfig;
 use dotenv::dotenv;
-
 use std::{net::SocketAddr, path::PathBuf};
-
-use crate::{handlers, AppState};
 
 #[derive(Clone, Copy)]
 struct Ports {
@@ -50,36 +48,16 @@ async fn redirect_http_to_https(ports: Ports) {
         .unwrap();
 }
 
-pub struct ServerRouter {}
-impl ServerRouter {
-    pub fn new() -> Self {
-        Self {}
-    }
-}
-
 pub struct Server {}
 
 impl Server {
-    pub fn get_router(&self) -> Router {
-        let state = AppState::default();
-        let api = Router::new()
-            .route("/", get(handlers::root))
-            .route(
-                "/get_authorization_url",
-                get(handlers::get_authorization_url),
-            )
-            .route("/auth/callback/tda", get(handlers::auth_callback_tda));
-        let router = Router::new().nest("/api", api).with_state(state);
-        router
-    }
-
-    pub async fn start(&self, router: Option<Router>) {
+    pub async fn start(&self, router: Option<axum::Router>) {
         dotenv().ok();
         tracing_subscriber::fmt::init();
 
         let app = match router {
             Some(router) => router,
-            None => self.get_router(),
+            None => Router::default().get_router(),
         };
         let ports = Ports {
             http: 7878,

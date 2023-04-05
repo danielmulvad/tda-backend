@@ -2,8 +2,6 @@
 *
 
 # Folders
-!bindings/
-!bindings/*.*
 !self_signed_certs/
 !src/
 !src/**
