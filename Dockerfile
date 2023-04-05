@@ -3,9 +3,8 @@ FROM rust:1.68-slim as builder
 
 WORKDIR /usr/src/tda-server
 
-RUN --mount=type=bind,target=. \
-  --mount=type=secret,id=PRIVATE_CERTIFICATE_CERT \
-  --mount=type=secret,id=PRIVATE_CERTIFICATE_KEY
+RUN --mount type=secret,id=PRIVATE_CERTIFICATE_CERT \
+  --mount type=secret,id=PRIVATE_CERTIFICATE_KEY
 
 RUN mkdir ./self_signed_certs
 RUN cat /run/secrets/PRIVATE_CERTIFICATE_CERT > ./self_signed_certs/cert.pem
