@@ -50,11 +50,11 @@ pub async fn auth_callback_tda(
     let token_response = state.td_client.exchange_code_for_token(code).await;
     match token_response {
         Ok(token_response) => {
-            let now = OffsetDateTime::now_utc();
+            access_token.set_value(token_response.access_token);
+            refresh_token.set_value(token_response.refresh_token);
             if base_url_host == "localhost" {
-                access_token.set_value(token_response.access_token);
+                let now = OffsetDateTime::now_utc();
                 access_token.set_expires(now);
-                refresh_token.set_value(token_response.refresh_token);
                 refresh_token.set_expires(now);
             } else {
                 let access_token_expires = OffsetDateTime::now_utc()
