@@ -1,0 +1,21 @@
+[package]
+name = "tda-stack"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+axum-test = { version = "7.0" }
+axum = { version = "0.6", features = ["http2", "query"] }
+axum-server = { version = "0.4", features = ["tls-rustls"] }
+dotenv = { version = "0.15" }
+hyper = { version = "0.14", features = ["full"] }
+reqwest = { version = "0.11", features = ["json"] }
+tokio = { version = "1.26", features = ["full"] }
+tower = { version = "0.4" }
+tracing = { version = "0.1" }
+tracing-subscriber = { version = '0.3' }
+serde = { version = "1.0", features = ["derive"] }
+axum-macros = { version = "0.3" }
+ts-rs = { version = "6.2" }

@@ -1,0 +1,17 @@
+# Ignore Everything
+*
+
+# Folders
+!bindings/
+!bindings/*.*
+!self_signed_certs/
+!src/
+!src/**
+
+# Dotfiles
+!.env
+!.gitignore
+
+# Dependencies
+!Cargo.toml
+!Cargo.lock
