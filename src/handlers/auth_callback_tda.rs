@@ -5,7 +5,7 @@ use axum::{
 };
 use cookie::{
     time::{Duration, OffsetDateTime},
-    Cookie, Expiration,
+    Cookie, Expiration, SameSite,
 };
 use hyper::header::SET_COOKIE;
 use std::env;
@@ -50,6 +50,8 @@ pub async fn auth_callback_tda(
     let token_response = state.td_client.exchange_code_for_token(code).await;
     match token_response {
         Ok(token_response) => {
+            access_token.set_same_site(SameSite::Lax);
+            refresh_token.set_same_site(SameSite::Lax);
             access_token.set_value(token_response.access_token);
             refresh_token.set_value(token_response.refresh_token);
             if base_url_host == "localhost" {
