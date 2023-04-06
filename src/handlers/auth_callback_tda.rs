@@ -1,4 +1,7 @@
-use crate::{td_client::TokenResponse, AppState};
+use crate::{
+    td_client::{TDAmeritradeClientAuthentication, TokenResponse},
+    AppState,
+};
 use axum::{
     extract::{Query, State},
     response::{IntoResponse, Redirect},

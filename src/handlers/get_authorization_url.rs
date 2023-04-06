@@ -1,4 +1,4 @@
-use crate::AppState;
+use crate::{td_client::TDAmeritradeClientAuthentication, AppState};
 use axum::{extract::State, http::StatusCode, Json};
 
 #[derive(serde::Serialize)]

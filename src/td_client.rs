@@ -1,3 +1,4 @@
+use async_trait::async_trait;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -37,26 +38,31 @@ impl Default for TDAmeritradeClient {
     }
 }
 
-impl TDAmeritradeClient {
-    pub fn new() -> Self {
-        let client = match Client::builder().build() {
-            Ok(client) => client,
-            Err(e) => panic!("Error building client: {:?}", e),
-        };
-        let base_url = "https://api.tdameritrade.com/v1".to_string();
-        let api_key = env::var("TDA_API_KEY").expect("TDA_API_KEY not found in .env");
+#[async_trait]
+pub trait TDAmeritradeClientAuthentication {
+    fn get_authorization_url(&self) -> String;
+    async fn exchange_code_for_token(&self, code: &str) -> Result<TokenResponse, reqwest::Error>;
+}
 
-        TDAmeritradeClient {
-            client,
-            base_url,
-            api_key,
-        }
+#[async_trait]
+impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
+    fn get_authorization_url(&self) -> String {
+        let client_id = &self.api_key;
+        let callback_url =
+            env::var("TDA_API_CALLBACK_URL").expect("TDA_API_CALLBACK_URL not found in .env");
+        let redirect_uri =
+            form_urlencoded::byte_serialize(callback_url.as_bytes()).collect::<String>();
+        let base_url = "https://auth.tdameritrade.com/auth";
+        let response_type = "code";
+        let scope = "AccountAccess";
+
+        format!(
+            "{}?response_type={}&redirect_uri={}&client_id={}%40AMER.OAUTHAP&scope={}",
+            base_url, response_type, redirect_uri, client_id, scope
+        )
     }
 
-    pub async fn exchange_code_for_token(
-        &self,
-        code: &str,
-    ) -> Result<TokenResponse, reqwest::Error> {
+    async fn exchange_code_for_token(&self, code: &str) -> Result<TokenResponse, reqwest::Error> {
         let url = format!("{}/oauth2/token", self.base_url);
         let redirect_uri =
             env::var("TDA_API_CALLBACK_URL").expect("TDA_API_CALLBACK_URL not found in .env");
@@ -84,27 +90,28 @@ impl TDAmeritradeClient {
             }
         }
     }
+}
 
-    pub fn get_authorization_url(&self) -> String {
-        let client_id = &self.api_key;
-        let callback_url =
-            env::var("TDA_API_CALLBACK_URL").expect("TDA_API_CALLBACK_URL not found in .env");
-        let redirect_uri =
-            form_urlencoded::byte_serialize(callback_url.as_bytes()).collect::<String>();
-        let base_url = "https://auth.tdameritrade.com/auth";
-        let response_type = "code";
-        let scope = "AccountAccess";
+impl TDAmeritradeClient {
+    pub fn new() -> Self {
+        let client = match Client::builder().build() {
+            Ok(client) => client,
+            Err(e) => panic!("Error building client: {:?}", e),
+        };
+        let base_url = "https://api.tdameritrade.com/v1".to_string();
+        let api_key = env::var("TDA_API_KEY").expect("TDA_API_KEY not found in .env");
 
-        format!(
-            "{}?response_type={}&redirect_uri={}&client_id={}%40AMER.OAUTHAP&scope={}",
-            base_url, response_type, redirect_uri, client_id, scope
-        )
+        TDAmeritradeClient {
+            client,
+            base_url,
+            api_key,
+        }
     }
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::td_client::TDAmeritradeClient;
+    use crate::td_client::{TDAmeritradeClient, TDAmeritradeClientAuthentication};
 
     #[tokio::test]
     async fn test_exchange_code_for_token() {
