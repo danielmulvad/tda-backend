@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use url::form_urlencoded;
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TokenResponse {
     pub access_token: String,
     pub token_type: String,
