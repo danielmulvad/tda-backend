@@ -3,16 +3,11 @@ FROM rust:1.68-slim as builder
 
 WORKDIR /usr/src/tda-server
 
-RUN mkdir ./self_signed_certs
-RUN --mount=type=secret,id=PRIVATE_CERTIFICATE_CERT cat /run/secrets/PRIVATE_CERTIFICATE_CERT > ./self_signed_certs/cert.pem
-RUN --mount=type=secret,id=PRIVATE_CERTIFICATE_KEY cat /run/secrets/PRIVATE_CERTIFICATE_KEY > ./self_signed_certs/key.pem
-
 COPY ./Cargo.toml ./Cargo.toml
 COPY ./Cargo.lock ./Cargo.lock
 COPY ./src/ ./src/
 COPY ./.env ./.env
 
-RUN apt update && apt install pkg-config openssl libssl-dev ca-certificates -y
 RUN cargo install --path . --target-dir ./target
 
 # Runner
@@ -22,7 +17,6 @@ COPY --from=builder /usr/src/tda-server /usr/local/bin/tda-server
 WORKDIR /usr/local/bin/tda-server/target/release
 
 COPY .env ./.env
-RUN apt update && apt install pkg-config openssl libssl-dev ca-certificates -y
 
 EXPOSE 3000
 

@@ -39,13 +39,7 @@ impl Default for TDAmeritradeClient {
 
 impl TDAmeritradeClient {
     pub fn new() -> Self {
-        let client = match Client::builder()
-            .add_root_certificate(
-                reqwest::Certificate::from_pem(include_bytes!("../self_signed_certs/cert.pem"))
-                    .unwrap(),
-            )
-            .build()
-        {
+        let client = match Client::builder().build() {
             Ok(client) => client,
             Err(e) => panic!("Error building client: {:?}", e),
         };
