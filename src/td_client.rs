@@ -25,6 +25,74 @@ impl Default for TokenResponse {
     }
 }
 
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct GetAccountsResponse {
+    pub securities_account: SecuritiesAccount,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct SecuritiesAccount {
+    pub account_id: String,
+    pub round_trips: u64,
+    pub is_day_trader: bool,
+    pub is_closing_only_restricted: bool,
+    pub initial_balances: InitialBalances,
+    pub current_balances: CurrentBalances,
+    pub projected_balances: ProjectedBalances,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct InitialBalances {
+    pub accrued_interest: f64,
+    pub cash_available_for_trading: f64,
+    pub cash_available_for_withdrawal: f64,
+    pub cash_balance: f64,
+    pub bond_value: f64,
+    pub cash_receipts: f64,
+    pub liquidation_value: f64,
+    pub long_option_market_value: f64,
+    pub long_stock_value: f64,
+    pub money_market_fund: f64,
+    pub mutual_fund_value: f64,
+    pub short_option_market_value: f64,
+    pub short_stock_value: f64,
+    pub is_in_call: bool,
+    pub unsettled_cash: f64,
+    pub cash_debit_call_value: f64,
+    pub pending_deposits: f64,
+    pub account_value: f64,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct CurrentBalances {
+    pub accrued_interest: f64,
+    pub cash_balance: f64,
+    pub cash_receipts: f64,
+    pub long_option_market_value: f64,
+    pub liquidation_value: f64,
+    pub long_market_value: f64,
+    pub money_market_fund: f64,
+    pub savings: f64,
+    pub short_market_value: f64,
+    pub pending_deposits: f64,
+    pub cash_available_for_trading: f64,
+    pub cash_available_for_withdrawal: f64,
+    pub cash_call: f64,
+    pub long_non_marginable_market_value: f64,
+    pub total_cash: f64,
+    pub short_option_market_value: f64,
+    pub mutual_fund_value: f64,
+    pub bond_value: f64,
+    pub cash_debit_call_value: f64,
+    pub unsettled_cash: f64,
+}
+
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct ProjectedBalances {
+    pub cash_available_for_trading: f64,
+    pub cash_available_for_withdrawal: f64,
+}
+
 #[derive(Clone)]
 pub struct TDAmeritradeClient {
     client: Client,
@@ -41,7 +109,29 @@ impl Default for TDAmeritradeClient {
 #[async_trait]
 pub trait TDAmeritradeClientAuthentication {
     fn get_authorization_url(&self) -> String;
-    async fn exchange_code_for_token(&self, code: &str) -> Result<TokenResponse, reqwest::Error>;
+    async fn exchange_code_for_token(&self, code: &str) -> TokenResponse;
+}
+
+#[async_trait]
+pub trait TDAmeritradeClientAccounts {
+    async fn get_accounts(&self, token: &str) -> GetAccountsResponse;
+}
+
+#[async_trait]
+impl TDAmeritradeClientAccounts for TDAmeritradeClient {
+    async fn get_accounts(&self, token: &str) -> GetAccountsResponse {
+        let url = format!("{}/accounts", self.base_url);
+        let request = self.client.get(&url).bearer_auth(token).send().await;
+        let json = match request {
+            Ok(data) => data.json::<GetAccountsResponse>().await,
+            Err(_) => Ok(GetAccountsResponse::default()),
+        };
+        let data = match json {
+            Ok(data) => data,
+            Err(_) => GetAccountsResponse::default(),
+        };
+        data
+    }
 }
 
 #[async_trait]
@@ -62,7 +152,7 @@ impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
         )
     }
 
-    async fn exchange_code_for_token(&self, code: &str) -> Result<TokenResponse, reqwest::Error> {
+    async fn exchange_code_for_token(&self, code: &str) -> TokenResponse {
         let url = format!("{}/oauth2/token", self.base_url);
         let redirect_uri =
             env::var("TDA_API_CALLBACK_URL").expect("TDA_API_CALLBACK_URL not found in .env");
@@ -76,19 +166,14 @@ impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
 
         let res = self.client.post(&url).form(&params).send().await;
         let json = match res {
-            Ok(res) => res.json::<TokenResponse>().await,
-            Err(e) => {
-                println!("error: {:?}", e);
-                Err(e)
-            }
+            Ok(data) => data.json::<TokenResponse>().await,
+            Err(_) => Ok(TokenResponse::default()),
         };
-        match json {
-            Ok(json) => Ok(json),
-            Err(e) => {
-                println!("error: {:?}", e);
-                Err(e)
-            }
-        }
+        let data = match json {
+            Ok(data) => data,
+            Err(_) => TokenResponse::default(),
+        };
+        data
     }
 }
 

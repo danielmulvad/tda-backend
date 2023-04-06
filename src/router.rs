@@ -10,7 +10,8 @@ impl Default for Router {
         let api = axum::Router::new()
             .route("/", get(handlers::root))
             .route("/auth/providers/tda", get(handlers::get_authorization_url))
-            .route("/auth/callback/tda", get(handlers::auth_callback_tda));
+            .route("/auth/callback/tda", get(handlers::auth_callback_tda))
+            .route("/get_accounts", get(handlers::get_accounts));
         let router = axum::Router::new().nest("/api", api).with_state(state);
         Self { router: router }
     }

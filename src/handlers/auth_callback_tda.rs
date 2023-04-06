@@ -7,7 +7,6 @@ use axum::{
     response::{IntoResponse, Redirect},
 };
 use axum_extra::extract::cookie::{Cookie, CookieJar};
-use axum_macros::debug_handler;
 use cookie::{
     time::{Duration, OffsetDateTime},
     Expiration, SameSite,
@@ -64,7 +63,6 @@ fn create_refresh_token(token: TokenResponse) -> Cookie<'static> {
     cookie
 }
 
-#[debug_handler]
 pub async fn auth_callback_tda(
     jar: CookieJar,
     State(state): State<AppState>,
@@ -73,15 +71,9 @@ pub async fn auth_callback_tda(
     let code = &query.code;
     let token_response = state.td_client.exchange_code_for_token(code).await;
     let base_url = get_base_url();
-    match token_response {
-        Ok(token_response) => (
-            jar.add(create_access_token(token_response.clone()))
-                .add(create_refresh_token(token_response)),
-            Redirect::permanent(base_url.as_str()),
-        ),
-        Err(e) => {
-            println!("error: {:?}", e);
-            (jar, Redirect::permanent(base_url.as_str()))
-        }
-    }
+    (
+        jar.add(create_access_token(token_response.clone()))
+            .add(create_refresh_token(token_response)),
+        Redirect::permanent(base_url.as_str()),
+    )
 }
