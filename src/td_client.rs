@@ -109,7 +109,8 @@ impl Default for TDAmeritradeClient {
 #[async_trait]
 pub trait TDAmeritradeClientAuthentication {
     fn get_authorization_url(&self) -> String;
-    async fn exchange_code_for_token(&self, code: &str) -> TokenResponse;
+    async fn exchange_authorization_code_for_token(&self, code: &str) -> TokenResponse;
+    async fn exchange_refresh_token_for_token(&self, refresh_token: &str) -> TokenResponse;
 }
 
 #[async_trait]
@@ -152,7 +153,7 @@ impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
         )
     }
 
-    async fn exchange_code_for_token(&self, code: &str) -> TokenResponse {
+    async fn exchange_authorization_code_for_token(&self, code: &str) -> TokenResponse {
         let url = format!("{}/oauth2/token", self.base_url);
         let redirect_uri =
             env::var("TDA_API_CALLBACK_URL").expect("TDA_API_CALLBACK_URL not found in .env");
@@ -162,6 +163,26 @@ impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
             ("code", code),
             ("client_id", &self.api_key),
             ("redirect_uri", redirect_uri.as_str()),
+        ];
+
+        let res = self.client.post(&url).form(&params).send().await;
+        let json = match res {
+            Ok(data) => data.json::<TokenResponse>().await,
+            Err(_) => Ok(TokenResponse::default()),
+        };
+        let data = match json {
+            Ok(data) => data,
+            Err(_) => TokenResponse::default(),
+        };
+        data
+    }
+
+    async fn exchange_refresh_token_for_token(&self, refresh_token: &str) -> TokenResponse {
+        let url = format!("{}/oauth2/token", self.base_url);
+        let params = [
+            ("grant_type", "refresh_token"),
+            ("refresh_token", refresh_token),
+            ("client_id", &self.api_key),
         ];
 
         let res = self.client.post(&url).form(&params).send().await;
@@ -199,13 +220,13 @@ mod tests {
     use crate::td_client::{TDAmeritradeClient, TDAmeritradeClientAuthentication};
 
     #[tokio::test]
-    async fn test_exchange_code_for_token() {
+    async fn test_exchange_authorization_code_for_token() {
         use super::*;
         use dotenv::dotenv;
         dotenv().ok();
         let client = TDAmeritradeClient::new();
         let code = "code";
-        let token_response = client.exchange_code_for_token(code).await;
+        let token_response = client.exchange_authorization_code_for_token(code).await;
         println!("token_response: {:?}", token_response);
     }
     #[test]

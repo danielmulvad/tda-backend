@@ -1,5 +1,5 @@
 use crate::{handlers, AppState};
-use axum::routing::get;
+use axum::routing::{get, post};
 
 pub struct Router {
     router: axum::Router,
@@ -10,6 +10,7 @@ impl Default for Router {
         let api = axum::Router::new()
             .route("/", get(handlers::root))
             .route("/auth/providers/tda", get(handlers::get_authorization_url))
+            .route("/auth/providers/tda", post(handlers::auth_refresh_token))
             .route("/auth/callback/tda", get(handlers::auth_callback_tda))
             .route("/get_accounts", get(handlers::get_accounts));
         let router = axum::Router::new().nest("/api", api).with_state(state);

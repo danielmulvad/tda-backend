@@ -15,7 +15,7 @@ use std::env;
 
 #[derive(serde::Deserialize)]
 pub struct AuthCallbackTdaQuery {
-    code: String,
+    code: Option<String>,
 }
 
 fn get_base_url() -> url::Url {
@@ -43,7 +43,7 @@ fn create_cookie(name: &str) -> Cookie {
     cookie.into_owned()
 }
 
-fn create_access_token(token: TokenResponse) -> Cookie<'static> {
+pub fn create_access_token(token: TokenResponse) -> Cookie<'static> {
     let access_token_expires = OffsetDateTime::now_utc()
         .checked_add(Duration::minutes(30))
         .unwrap();
@@ -53,7 +53,7 @@ fn create_access_token(token: TokenResponse) -> Cookie<'static> {
     cookie
 }
 
-fn create_refresh_token(token: TokenResponse) -> Cookie<'static> {
+pub fn create_refresh_token(token: TokenResponse) -> Cookie<'static> {
     let refresh_token_expires = OffsetDateTime::now_utc()
         .checked_add(Duration::minutes(30))
         .unwrap();
@@ -68,8 +68,11 @@ pub async fn auth_callback_tda(
     State(state): State<AppState>,
     Query(query): Query<AuthCallbackTdaQuery>,
 ) -> impl IntoResponse {
-    let code = &query.code;
-    let token_response = state.td_client.exchange_code_for_token(code).await;
+    let code = &query.code.unwrap_or("".to_string());
+    let token_response = state
+        .td_client
+        .exchange_authorization_code_for_token(code)
+        .await;
     let base_url = get_base_url();
     (
         jar.add(create_access_token(token_response.clone()))
