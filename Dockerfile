@@ -8,7 +8,7 @@ COPY ./Cargo.lock ./Cargo.lock
 COPY ./src/ ./src/
 COPY ./.env ./.env
 
-RUN apt update && apt install pkg-config -y
+RUN apt update && apt install pkg-config openssl -y
 RUN cargo install --path . --target-dir ./target
 
 # Runner
