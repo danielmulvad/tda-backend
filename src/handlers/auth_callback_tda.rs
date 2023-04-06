@@ -15,7 +15,7 @@ use std::env;
 
 #[derive(serde::Deserialize)]
 pub struct AuthCallbackTdaQuery {
-    code: Option<String>,
+    code: String,
 }
 
 fn get_base_url() -> url::Url {
@@ -68,7 +68,7 @@ pub async fn auth_callback_tda(
     State(state): State<AppState>,
     Query(query): Query<AuthCallbackTdaQuery>,
 ) -> impl IntoResponse {
-    let code = &query.code.unwrap_or("".to_string());
+    let code = &query.code;
     let token_response = state
         .td_client
         .exchange_authorization_code_for_token(code)
