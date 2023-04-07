@@ -14,7 +14,7 @@ impl Default for Router {
             .route("/auth/callback/tda", get(handlers::auth_callback_tda))
             .route("/get_accounts", get(handlers::get_accounts));
         let router = axum::Router::new().nest("/api", api).with_state(state);
-        Self { router: router }
+        Self { router }
     }
 }
 impl Router {
@@ -24,6 +24,6 @@ impl Router {
 
     pub fn new() -> Self {
         let router = axum::Router::new().nest("/api", axum::Router::new());
-        Self { router: router }
+        Self { router }
     }
 }

@@ -25,18 +25,14 @@ where
 }
 
 pub fn create_access_token(token: TokenResponse) -> Cookie<'static> {
-    let access_token_expires = OffsetDateTime::now_utc()
-        .checked_add(Duration::minutes(30))
-        .unwrap();
+    let access_token_expires = OffsetDateTime::now_utc().checked_add(Duration::minutes(30)).unwrap();
     let mut cookie = create_cookie("access_token", token.access_token);
     cookie.set_expires(Expiration::DateTime(access_token_expires));
     cookie
 }
 
 pub fn create_refresh_token(token: TokenResponse) -> Cookie<'static> {
-    let refresh_token_expires = OffsetDateTime::now_utc()
-        .checked_add(Duration::minutes(30))
-        .unwrap();
+    let refresh_token_expires = OffsetDateTime::now_utc().checked_add(Duration::minutes(30)).unwrap();
     let mut cookie = create_cookie("refresh_token", token.refresh_token);
     cookie.set_expires(Expiration::DateTime(refresh_token_expires));
     cookie

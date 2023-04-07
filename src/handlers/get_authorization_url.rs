@@ -6,14 +6,9 @@ pub struct GetAuthorizationUrlResponse {
     authorization_url: String,
 }
 
-pub async fn get_authorization_url(
-    State(state): State<AppState>,
-) -> (StatusCode, Json<GetAuthorizationUrlResponse>) {
+pub async fn get_authorization_url(State(state): State<AppState>) -> (StatusCode, Json<GetAuthorizationUrlResponse>) {
     let authorization_url = state.td_client.get_authorization_url();
-    (
-        StatusCode::OK,
-        Json(GetAuthorizationUrlResponse { authorization_url }),
-    )
+    (StatusCode::OK, Json(GetAuthorizationUrlResponse { authorization_url }))
 }
 
 #[cfg(test)]

@@ -13,10 +13,7 @@ impl Server {
 
         let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
         info!("Listening on {}", addr);
-        axum::Server::bind(&addr)
-            .serve(app.into_make_service())
-            .await
-            .unwrap()
+        axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap()
     }
 
     pub fn new() -> Self {

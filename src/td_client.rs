@@ -117,14 +117,8 @@ impl Default for TDAmeritradeClient {
 #[async_trait]
 pub trait TDAmeritradeClientAuthentication {
     fn get_authorization_url(&self) -> String;
-    async fn exchange_authorization_code_for_token(
-        &self,
-        code: &str,
-    ) -> Result<TokenResponse, reqwest::Error>;
-    async fn exchange_refresh_token_for_token(
-        &self,
-        refresh_token: &str,
-    ) -> Result<TokenResponse, reqwest::Error>;
+    async fn exchange_authorization_code_for_token(&self, code: &str) -> Result<TokenResponse, reqwest::Error>;
+    async fn exchange_refresh_token_for_token(&self, refresh_token: &str) -> Result<TokenResponse, reqwest::Error>;
 }
 
 #[async_trait]
@@ -159,10 +153,8 @@ impl TDAmeritradeClientAccounts for TDAmeritradeClient {
 impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
     fn get_authorization_url(&self) -> String {
         let client_id = &self.api_key;
-        let callback_url =
-            env::var("TDA_API_CALLBACK_URL").expect("TDA_API_CALLBACK_URL not found in .env");
-        let redirect_uri =
-            form_urlencoded::byte_serialize(callback_url.as_bytes()).collect::<String>();
+        let callback_url = env::var("TDA_API_CALLBACK_URL").expect("TDA_API_CALLBACK_URL not found in .env");
+        let redirect_uri = form_urlencoded::byte_serialize(callback_url.as_bytes()).collect::<String>();
         let base_url = "https://auth.tdameritrade.com/auth";
         let response_type = "code";
         let scope = "AccountAccess";
@@ -173,13 +165,9 @@ impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
         )
     }
 
-    async fn exchange_authorization_code_for_token(
-        &self,
-        code: &str,
-    ) -> Result<TokenResponse, reqwest::Error> {
+    async fn exchange_authorization_code_for_token(&self, code: &str) -> Result<TokenResponse, reqwest::Error> {
         let url = format!("{}/oauth2/token", self.base_url);
-        let redirect_uri =
-            env::var("TDA_API_CALLBACK_URL").expect("TDA_API_CALLBACK_URL not found in .env");
+        let redirect_uri = env::var("TDA_API_CALLBACK_URL").expect("TDA_API_CALLBACK_URL not found in .env");
         let params = [
             ("grant_type", "authorization_code"),
             ("access_type", "offline"),
@@ -201,16 +189,9 @@ impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
         }
     }
 
-    async fn exchange_refresh_token_for_token(
-        &self,
-        refresh_token: &str,
-    ) -> Result<TokenResponse, reqwest::Error> {
+    async fn exchange_refresh_token_for_token(&self, refresh_token: &str) -> Result<TokenResponse, reqwest::Error> {
         let url = format!("{}/oauth2/token", self.base_url);
-        let params = [
-            ("grant_type", "refresh_token"),
-            ("refresh_token", refresh_token),
-            ("client_id", &self.api_key),
-        ];
+        let params = [("grant_type", "refresh_token"), ("refresh_token", refresh_token), ("client_id", &self.api_key)];
 
         let res = self.client.post(&url).form(&params).send().await;
         match res {
@@ -235,11 +216,7 @@ impl TDAmeritradeClient {
         let base_url = "https://api.tdameritrade.com/v1".to_string();
         let api_key = env::var("TDA_API_KEY").expect("TDA_API_KEY not found in .env");
 
-        TDAmeritradeClient {
-            client,
-            base_url,
-            api_key,
-        }
+        TDAmeritradeClient { client, base_url, api_key }
     }
 }
 
