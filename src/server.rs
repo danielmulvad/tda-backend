@@ -1,5 +1,4 @@
 use crate::router::Router;
-use dotenv::dotenv;
 use log::info;
 use std::net::SocketAddr;
 
@@ -7,7 +6,6 @@ pub struct Server {}
 
 impl Server {
     pub async fn start(&self, router: Option<axum::Router>) {
-        dotenv().ok();
         let app = match router {
             Some(router) => router,
             None => Router::default().get_router(),
