@@ -19,7 +19,7 @@ where
     let mut cookie = Cookie::new(name, value);
     cookie.set_domain(base_url_host);
     cookie.set_path("/");
-    cookie.set_same_site(SameSite::Lax);
+    cookie.set_same_site(SameSite::Strict);
     cookie.set_secure(true);
     cookie
 }
