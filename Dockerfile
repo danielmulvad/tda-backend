@@ -24,4 +24,4 @@ RUN apt update && apt install pkg-config openssl libssl-dev ca-certificates -y
 
 EXPOSE 3000
 
-ENTRYPOINT ["./tda-server"]
+ENTRYPOINT ["RUST_LOG=debug ./tda-server"]

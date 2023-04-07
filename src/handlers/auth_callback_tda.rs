@@ -11,6 +11,7 @@ use cookie::{
     time::{Duration, OffsetDateTime},
     Expiration, SameSite,
 };
+use log::error;
 use std::env;
 
 #[derive(serde::Deserialize)]
@@ -23,7 +24,7 @@ fn get_base_url() -> url::Url {
     match url::Url::parse(&base_url_tmp) {
         Ok(url) => url,
         Err(e) => {
-            println!("error: {:?}", e);
+            error!("error: {:?}", e);
             return url::Url::parse("http://localhost:3000").unwrap();
         }
     }
@@ -77,7 +78,7 @@ pub async fn auth_callback_tda(
     {
         Ok(data) => data,
         Err(e) => {
-            println!("auth_callback_tda error: {}", e);
+            error!("auth_callback_tda error: {}", e);
             return (jar, Redirect::permanent(base_url.as_str()));
         }
     };

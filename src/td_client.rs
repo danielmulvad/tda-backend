@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use log::error;
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -133,14 +134,14 @@ impl TDAmeritradeClientAccounts for TDAmeritradeClient {
         let json = match request {
             Ok(data) => data.json::<GetAccountsResponse>().await,
             Err(e) => {
-                println!("get_accounts request error: {}", e);
+                error!("get_accounts request error: {}", e);
                 Ok(GetAccountsResponse::default())
             }
         };
         let data = match json {
             Ok(data) => data,
             Err(e) => {
-                println!("get_accounts json error: {}", e);
+                error!("get_accounts json error: {}", e);
                 GetAccountsResponse::default()
             }
         };
@@ -185,7 +186,7 @@ impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
         match res {
             Ok(data) => data.json::<TokenResponse>().await,
             Err(e) => {
-                println!("exchange_authorization_code_for_token error: {}", e);
+                error!("exchange_authorization_code_for_token error: {}", e);
                 Err(e)
             }
         }
@@ -206,7 +207,7 @@ impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
         match res {
             Ok(data) => data.json::<TokenResponse>().await,
             Err(e) => {
-                println!("exchange_refresh_token_for_token error: {}", e);
+                error!("exchange_refresh_token_for_token error: {}", e);
                 Err(e)
             }
         }
@@ -232,6 +233,8 @@ impl TDAmeritradeClient {
 
 #[cfg(test)]
 mod tests {
+    use log::debug;
+
     use crate::td_client::{TDAmeritradeClient, TDAmeritradeClientAuthentication};
 
     #[tokio::test]
@@ -242,7 +245,7 @@ mod tests {
         let client = TDAmeritradeClient::new();
         let code = "code";
         let token_response = client.exchange_authorization_code_for_token(code).await;
-        println!("token_response: {:?}", token_response);
+        debug!("token_response: {:?}", token_response);
     }
     #[test]
     fn test_get_authorization_url() {

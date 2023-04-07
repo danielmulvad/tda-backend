@@ -4,6 +4,7 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 use hyper::StatusCode;
+use log::error;
 use serde::Deserialize;
 
 use crate::{
@@ -31,7 +32,7 @@ pub async fn auth_refresh_token(
     {
         Ok(data) => data,
         Err(e) => {
-            println!("auth_refresh_token error: {}", e);
+            error!("auth_refresh_token error: {}", e);
             return (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 jar,
