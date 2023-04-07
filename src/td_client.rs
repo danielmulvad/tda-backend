@@ -109,8 +109,14 @@ impl Default for TDAmeritradeClient {
 #[async_trait]
 pub trait TDAmeritradeClientAuthentication {
     fn get_authorization_url(&self) -> String;
-    async fn exchange_authorization_code_for_token(&self, code: &str) -> TokenResponse;
-    async fn exchange_refresh_token_for_token(&self, refresh_token: &str) -> TokenResponse;
+    async fn exchange_authorization_code_for_token(
+        &self,
+        code: &str,
+    ) -> Result<TokenResponse, reqwest::Error>;
+    async fn exchange_refresh_token_for_token(
+        &self,
+        refresh_token: &str,
+    ) -> Result<TokenResponse, reqwest::Error>;
 }
 
 #[async_trait]
@@ -160,7 +166,10 @@ impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
         )
     }
 
-    async fn exchange_authorization_code_for_token(&self, code: &str) -> TokenResponse {
+    async fn exchange_authorization_code_for_token(
+        &self,
+        code: &str,
+    ) -> Result<TokenResponse, reqwest::Error> {
         let url = format!("{}/oauth2/token", self.base_url);
         let redirect_uri =
             env::var("TDA_API_CALLBACK_URL").expect("TDA_API_CALLBACK_URL not found in .env");
@@ -173,18 +182,19 @@ impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
         ];
 
         let res = self.client.post(&url).form(&params).send().await;
-        let json = match res {
+        match res {
             Ok(data) => data.json::<TokenResponse>().await,
-            Err(_) => Ok(TokenResponse::default()),
-        };
-        let data = match json {
-            Ok(data) => data,
-            Err(_) => TokenResponse::default(),
-        };
-        data
+            Err(e) => {
+                println!("exchange_authorization_code_for_token error: {}", e);
+                Err(e)
+            }
+        }
     }
 
-    async fn exchange_refresh_token_for_token(&self, refresh_token: &str) -> TokenResponse {
+    async fn exchange_refresh_token_for_token(
+        &self,
+        refresh_token: &str,
+    ) -> Result<TokenResponse, reqwest::Error> {
         let url = format!("{}/oauth2/token", self.base_url);
         let params = [
             ("grant_type", "refresh_token"),
@@ -193,15 +203,13 @@ impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
         ];
 
         let res = self.client.post(&url).form(&params).send().await;
-        let json = match res {
+        match res {
             Ok(data) => data.json::<TokenResponse>().await,
-            Err(_) => Ok(TokenResponse::default()),
-        };
-        let data = match json {
-            Ok(data) => data,
-            Err(_) => TokenResponse::default(),
-        };
-        data
+            Err(e) => {
+                println!("exchange_refresh_token_for_token error: {}", e);
+                Err(e)
+            }
+        }
     }
 }
 

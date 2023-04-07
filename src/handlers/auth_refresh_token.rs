@@ -3,9 +3,13 @@ use axum::{
     response::IntoResponse,
 };
 use axum_extra::extract::CookieJar;
+use hyper::StatusCode;
 use serde::Deserialize;
 
-use crate::{td_client::TDAmeritradeClientAuthentication, AppState};
+use crate::{
+    td_client::{TDAmeritradeClientAuthentication, TokenResponse},
+    AppState,
+};
 
 use super::auth_callback_tda::{create_access_token, create_refresh_token};
 
@@ -20,11 +24,23 @@ pub async fn auth_refresh_token(
     Json(json): Json<AuthRefreshTokenBody>,
 ) -> impl IntoResponse {
     let refresh_token = json.refresh_token;
-    let token_response = state
+    let token_response = match state
         .td_client
         .exchange_refresh_token_for_token(&refresh_token)
-        .await;
+        .await
+    {
+        Ok(data) => data,
+        Err(e) => {
+            println!("auth_refresh_token error: {}", e);
+            return (
+                StatusCode::INTERNAL_SERVER_ERROR,
+                jar,
+                Json(TokenResponse::default()),
+            );
+        }
+    };
     return (
+        StatusCode::OK,
         jar.add(create_access_token(token_response.clone()))
             .add(create_refresh_token(token_response.clone())),
         Json(token_response),
