@@ -139,10 +139,13 @@ impl TDAmeritradeClientAccounts for TDAmeritradeClient {
         let url = format!("{}/accounts", self.base_url);
         let request = self.client.get(&url).bearer_auth(token).send().await;
         let body = match request {
-            Ok(data) => data
-                .json::<GetAccountsResponse>()
-                .await
-                .unwrap_or(GetAccountsResponse::default()),
+            Ok(data) => match data.json().await {
+                Ok(json) => json,
+                Err(e) => {
+                    error!("get_accounts json error: {}", e);
+                    GetAccountsResponse::default()
+                }
+            },
             Err(e) => {
                 error!("get_accounts request error: {}", e);
                 GetAccountsResponse::default()
