@@ -146,6 +146,7 @@ impl TDAmeritradeClientAccounts for TDAmeritradeClient {
                 Bytes::new()
             }
         };
+        debug!("get_accounts tda response: {:?}", body);
         let response: GetAccountsResponse =
             match serde_json::from_slice::<GetAccountsResponse>(&body) {
                 Ok(data) => data,
@@ -154,6 +155,7 @@ impl TDAmeritradeClientAccounts for TDAmeritradeClient {
                     GetAccountsResponse::default()
                 }
             };
+        debug!("get_accounts response: {:?}", response);
         response
     }
 }
