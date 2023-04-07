@@ -2,6 +2,7 @@ use async_trait::async_trait;
 use log::{debug, error};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use std::env;
 use url::form_urlencoded;
 
@@ -122,23 +123,23 @@ pub trait TDAmeritradeClientAuthentication {
 
 #[async_trait]
 pub trait TDAmeritradeClientAccounts {
-    async fn get_accounts(&self, token: &str) -> GetAccountsResponse;
+    async fn get_accounts(&self, token: &str) -> Value;
 }
 
 #[async_trait]
 impl TDAmeritradeClientAccounts for TDAmeritradeClient {
-    async fn get_accounts(&self, token: &str) -> GetAccountsResponse {
+    async fn get_accounts(&self, token: &str) -> Value {
         format!("token: {}", token);
         let url = format!("{}/accounts", self.base_url);
         let request = self.client.get(&url).bearer_auth(token).send().await;
         let json = match request {
             Ok(data) => {
                 debug!("get_accounts response data: {:?}", data);
-                data.json::<GetAccountsResponse>().await
+                data.json::<Value>().await
             }
             Err(e) => {
                 error!("get_accounts request error: {}", e);
-                Ok(GetAccountsResponse::default())
+                Ok(Value::default())
             }
         };
         let data = match json {
@@ -148,7 +149,7 @@ impl TDAmeritradeClientAccounts for TDAmeritradeClient {
             }
             Err(e) => {
                 error!("get_accounts json error: {}", e);
-                GetAccountsResponse::default()
+                Value::default()
             }
         };
         data
