@@ -11,7 +11,7 @@ use cookie::{
     time::{Duration, OffsetDateTime},
     Expiration, SameSite,
 };
-use log::error;
+use log::{debug, error};
 use std::env;
 
 #[derive(serde::Deserialize)]
@@ -76,7 +76,10 @@ pub async fn auth_callback_tda(
         .exchange_authorization_code_for_token(code)
         .await
     {
-        Ok(data) => data,
+        Ok(data) => {
+            debug!("auth_callback_tda data: {:?}", data);
+            data
+        }
         Err(e) => {
             error!("auth_callback_tda error: {}", e);
             return (jar, Redirect::permanent(base_url.as_str()));

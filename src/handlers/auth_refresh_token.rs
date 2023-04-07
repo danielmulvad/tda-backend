@@ -4,7 +4,7 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 use hyper::StatusCode;
-use log::error;
+use log::{debug, error};
 use serde::Deserialize;
 
 use crate::{
@@ -30,7 +30,10 @@ pub async fn auth_refresh_token(
         .exchange_refresh_token_for_token(&refresh_token)
         .await
     {
-        Ok(data) => data,
+        Ok(data) => {
+            debug!("auth_refresh_token data: {:?}", data);
+            data
+        }
         Err(e) => {
             error!("auth_refresh_token error: {}", e);
             return (

@@ -1,5 +1,5 @@
 use async_trait::async_trait;
-use log::error;
+use log::{debug, error};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
 use std::env;
@@ -132,14 +132,20 @@ impl TDAmeritradeClientAccounts for TDAmeritradeClient {
         let url = format!("{}/accounts", self.base_url);
         let request = self.client.get(&url).bearer_auth(token).send().await;
         let json = match request {
-            Ok(data) => data.json::<GetAccountsResponse>().await,
+            Ok(data) => {
+                debug!("get_accounts response data: {:?}", data);
+                data.json::<GetAccountsResponse>().await
+            }
             Err(e) => {
                 error!("get_accounts request error: {}", e);
                 Ok(GetAccountsResponse::default())
             }
         };
         let data = match json {
-            Ok(data) => data,
+            Ok(data) => {
+                debug!("get_accounts json data: {:?}", data);
+                data
+            }
             Err(e) => {
                 error!("get_accounts json error: {}", e);
                 GetAccountsResponse::default()
@@ -184,7 +190,10 @@ impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
 
         let res = self.client.post(&url).form(&params).send().await;
         match res {
-            Ok(data) => data.json::<TokenResponse>().await,
+            Ok(data) => {
+                debug!("exchange_authorization_code_for_token data: {:?}", data);
+                data.json::<TokenResponse>().await
+            }
             Err(e) => {
                 error!("exchange_authorization_code_for_token error: {}", e);
                 Err(e)
@@ -205,7 +214,10 @@ impl TDAmeritradeClientAuthentication for TDAmeritradeClient {
 
         let res = self.client.post(&url).form(&params).send().await;
         match res {
-            Ok(data) => data.json::<TokenResponse>().await,
+            Ok(data) => {
+                debug!("exchange_refresh_token_for_token data: {:?}", data);
+                data.json::<TokenResponse>().await
+            }
             Err(e) => {
                 error!("exchange_refresh_token_for_token error: {}", e);
                 Err(e)
@@ -233,20 +245,8 @@ impl TDAmeritradeClient {
 
 #[cfg(test)]
 mod tests {
-    use log::debug;
-
     use crate::td_client::{TDAmeritradeClient, TDAmeritradeClientAuthentication};
 
-    #[tokio::test]
-    async fn test_exchange_authorization_code_for_token() {
-        use super::*;
-        use dotenv::dotenv;
-        dotenv().ok();
-        let client = TDAmeritradeClient::new();
-        let code = "code";
-        let token_response = client.exchange_authorization_code_for_token(code).await;
-        debug!("token_response: {:?}", token_response);
-    }
     #[test]
     fn test_get_authorization_url() {
         use dotenv::dotenv;
