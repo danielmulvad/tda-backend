@@ -1,4 +1,4 @@
-use crate::{td_client::TDAmeritradeClientAuthentication, AppState};
+use crate::{tda_client::auth::TDAmeritradeClientAuth, AppState};
 use axum::{extract::State, http::StatusCode, Json};
 
 #[derive(serde::Serialize)]
@@ -7,7 +7,7 @@ pub struct GetAuthorizationUrlResponse {
 }
 
 pub async fn get_authorization_url(State(state): State<AppState>) -> (StatusCode, Json<GetAuthorizationUrlResponse>) {
-    let authorization_url = state.td_client.get_authorization_url();
+    let authorization_url = state.tda_client.get_authorization_url();
     (StatusCode::OK, Json(GetAuthorizationUrlResponse { authorization_url }))
 }
 

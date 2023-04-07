@@ -1,12 +1,12 @@
 #[derive(Clone)]
 pub struct AppState {
-    td_client: td_client::TDAmeritradeClient,
+    tda_client: tda_client::TDAmeritradeClient,
 }
 
 impl Default for AppState {
     fn default() -> Self {
         AppState {
-            td_client: td_client::TDAmeritradeClient::new(),
+            tda_client: tda_client::TDAmeritradeClient::new(),
         }
     }
 }
@@ -14,5 +14,5 @@ impl Default for AppState {
 pub mod handlers;
 pub mod router;
 pub mod server;
-pub mod td_client;
+pub mod tda_client;
 pub mod utils;

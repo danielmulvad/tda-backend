@@ -1,5 +1,5 @@
 use super::get_base_url;
-use crate::td_client::TokenResponse;
+use crate::tda_client::auth::TokenResponse;
 use cookie::{
     time::{Duration, OffsetDateTime},
     Cookie, Expiration, SameSite,

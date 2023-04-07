@@ -1,5 +1,5 @@
 use crate::{
-    td_client::{TDAmeritradeClientAuthentication, TokenResponse},
+    tda_client::auth::{TDAmeritradeClientAuth, TokenResponse},
     utils::cookie::{create_access_token, create_refresh_token},
     AppState,
 };
@@ -19,7 +19,7 @@ pub struct AuthRefreshTokenBody {
 
 pub async fn auth_refresh_token(jar: CookieJar, State(state): State<AppState>, Json(json): Json<AuthRefreshTokenBody>) -> impl IntoResponse {
     let refresh_token = json.refresh_token;
-    let token_response = match state.td_client.exchange_refresh_token_for_token(&refresh_token).await {
+    let token_response = match state.tda_client.exchange_refresh_token_for_token(&refresh_token).await {
         Ok(data) => {
             debug!("auth_refresh_token data: {:?}", data);
             data
