@@ -1,3 +1,8 @@
+use crate::{
+    td_client::{TDAmeritradeClientAuthentication, TokenResponse},
+    utils::cookie::{create_access_token, create_refresh_token},
+    AppState,
+};
 use axum::{
     extract::{Json, State},
     response::IntoResponse,
@@ -6,13 +11,6 @@ use axum_extra::extract::CookieJar;
 use hyper::StatusCode;
 use log::{debug, error};
 use serde::Deserialize;
-
-use crate::{
-    td_client::{TDAmeritradeClientAuthentication, TokenResponse},
-    AppState,
-};
-
-use super::auth_callback_tda::{create_access_token, create_refresh_token};
 
 #[derive(Deserialize)]
 pub struct AuthRefreshTokenBody {
