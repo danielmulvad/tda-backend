@@ -27,70 +27,70 @@ impl Default for TokenResponse {
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct GetAccountsResponse {
-    pub securities_account: SecuritiesAccount,
+    pub securities_account: Option<SecuritiesAccount>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct SecuritiesAccount {
-    pub account_id: String,
-    pub round_trips: u64,
-    pub is_day_trader: bool,
-    pub is_closing_only_restricted: bool,
-    pub initial_balances: InitialBalances,
-    pub current_balances: CurrentBalances,
-    pub projected_balances: ProjectedBalances,
+    pub account_id: Option<String>,
+    pub round_trips: Option<u64>,
+    pub is_day_trader: Option<bool>,
+    pub is_closing_only_restricted: Option<bool>,
+    pub initial_balances: Option<InitialBalances>,
+    pub current_balances: Option<CurrentBalances>,
+    pub projected_balances: Option<ProjectedBalances>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct InitialBalances {
-    pub accrued_interest: f64,
-    pub cash_available_for_trading: f64,
-    pub cash_available_for_withdrawal: f64,
-    pub cash_balance: f64,
-    pub bond_value: f64,
-    pub cash_receipts: f64,
-    pub liquidation_value: f64,
-    pub long_option_market_value: f64,
-    pub long_stock_value: f64,
-    pub money_market_fund: f64,
-    pub mutual_fund_value: f64,
-    pub short_option_market_value: f64,
-    pub short_stock_value: f64,
-    pub is_in_call: bool,
-    pub unsettled_cash: f64,
-    pub cash_debit_call_value: f64,
-    pub pending_deposits: f64,
-    pub account_value: f64,
+    pub accrued_interest: Option<f64>,
+    pub cash_available_for_trading: Option<f64>,
+    pub cash_available_for_withdrawal: Option<f64>,
+    pub cash_balance: Option<f64>,
+    pub bond_value: Option<f64>,
+    pub cash_receipts: Option<f64>,
+    pub liquidation_value: Option<f64>,
+    pub long_option_market_value: Option<f64>,
+    pub long_stock_value: Option<f64>,
+    pub money_market_fund: Option<f64>,
+    pub mutual_fund_value: Option<f64>,
+    pub short_option_market_value: Option<f64>,
+    pub short_stock_value: Option<f64>,
+    pub is_in_call: Option<bool>,
+    pub unsettled_cash: Option<f64>,
+    pub cash_debit_call_value: Option<f64>,
+    pub pending_deposits: Option<f64>,
+    pub account_value: Option<f64>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct CurrentBalances {
-    pub accrued_interest: f64,
-    pub cash_balance: f64,
-    pub cash_receipts: f64,
-    pub long_option_market_value: f64,
-    pub liquidation_value: f64,
-    pub long_market_value: f64,
-    pub money_market_fund: f64,
-    pub savings: f64,
-    pub short_market_value: f64,
-    pub pending_deposits: f64,
-    pub cash_available_for_trading: f64,
-    pub cash_available_for_withdrawal: f64,
-    pub cash_call: f64,
-    pub long_non_marginable_market_value: f64,
-    pub total_cash: f64,
-    pub short_option_market_value: f64,
-    pub mutual_fund_value: f64,
-    pub bond_value: f64,
-    pub cash_debit_call_value: f64,
-    pub unsettled_cash: f64,
+    pub accrued_interest: Option<f64>,
+    pub cash_balance: Option<f64>,
+    pub cash_receipts: Option<f64>,
+    pub long_option_market_value: Option<f64>,
+    pub liquidation_value: Option<f64>,
+    pub long_market_value: Option<f64>,
+    pub money_market_fund: Option<f64>,
+    pub savings: Option<f64>,
+    pub short_market_value: Option<f64>,
+    pub pending_deposits: Option<f64>,
+    pub cash_available_for_trading: Option<f64>,
+    pub cash_available_for_withdrawal: Option<f64>,
+    pub cash_call: Option<f64>,
+    pub long_non_marginable_market_value: Option<f64>,
+    pub total_cash: Option<f64>,
+    pub short_option_market_value: Option<f64>,
+    pub mutual_fund_value: Option<f64>,
+    pub bond_value: Option<f64>,
+    pub cash_debit_call_value: Option<f64>,
+    pub unsettled_cash: Option<f64>,
 }
 
 #[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct ProjectedBalances {
-    pub cash_available_for_trading: f64,
-    pub cash_available_for_withdrawal: f64,
+    pub cash_available_for_trading: Option<f64>,
+    pub cash_available_for_withdrawal: Option<f64>,
 }
 
 #[derive(Clone)]
