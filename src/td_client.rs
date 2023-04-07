@@ -1,4 +1,5 @@
 use async_trait::async_trait;
+use axum::body::Bytes;
 use log::{debug, error};
 use reqwest::Client;
 use serde::{Deserialize, Serialize};
@@ -139,22 +140,21 @@ impl TDAmeritradeClientAccounts for TDAmeritradeClient {
         let url = format!("{}/accounts", self.base_url);
         let request = self.client.get(&url).bearer_auth(token).send().await;
         let body = match request {
-            Ok(data) => data.text().await,
+            Ok(data) => data.bytes().await.unwrap_or(Bytes::new()),
             Err(e) => {
                 error!("get_accounts request error: {}", e);
-                Ok("".to_string())
+                Bytes::new()
             }
         };
-        match body {
-            Ok(data) => {
-                let response: GetAccountsResponse = serde_json::from_str(&data).unwrap();
-                response
-            }
-            Err(e) => {
-                error!("get_accounts body error: {}", e);
-                GetAccountsResponse::default()
-            }
-        }
+        let response: GetAccountsResponse =
+            match serde_json::from_slice::<GetAccountsResponse>(&body) {
+                Ok(data) => data,
+                Err(e) => {
+                    error!("get_accounts response error: {}", e);
+                    GetAccountsResponse::default()
+                }
+            };
+        response
     }
 }
 
