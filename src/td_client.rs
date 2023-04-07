@@ -121,15 +121,22 @@ pub trait TDAmeritradeClientAccounts {
 #[async_trait]
 impl TDAmeritradeClientAccounts for TDAmeritradeClient {
     async fn get_accounts(&self, token: &str) -> GetAccountsResponse {
+        format!("token: {}", token);
         let url = format!("{}/accounts", self.base_url);
         let request = self.client.get(&url).bearer_auth(token).send().await;
         let json = match request {
             Ok(data) => data.json::<GetAccountsResponse>().await,
-            Err(_) => Ok(GetAccountsResponse::default()),
+            Err(e) => {
+                println!("get_accounts request error: {}", e);
+                Ok(GetAccountsResponse::default())
+            }
         };
         let data = match json {
             Ok(data) => data,
-            Err(_) => GetAccountsResponse::default(),
+            Err(e) => {
+                println!("get_accounts json error: {}", e);
+                GetAccountsResponse::default()
+            }
         };
         data
     }
