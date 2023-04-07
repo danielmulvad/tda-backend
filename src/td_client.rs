@@ -129,26 +129,26 @@ pub trait TDAmeritradeClientAuthentication {
 
 #[async_trait]
 pub trait TDAmeritradeClientAccounts {
-    async fn get_accounts(&self, token: &str) -> GetAccountsResponse;
+    async fn get_accounts(&self, token: &str) -> Vec<GetAccountsResponse>;
 }
 
 #[async_trait]
 impl TDAmeritradeClientAccounts for TDAmeritradeClient {
-    async fn get_accounts(&self, token: &str) -> GetAccountsResponse {
+    async fn get_accounts(&self, token: &str) -> Vec<GetAccountsResponse> {
         format!("token: {}", token);
         let url = format!("{}/accounts", self.base_url);
         let request = self.client.get(&url).bearer_auth(token).send().await;
         let body = match request {
-            Ok(data) => match data.json().await {
+            Ok(data) => match data.json::<Vec<GetAccountsResponse>>().await {
                 Ok(json) => json,
                 Err(e) => {
                     error!("get_accounts json error: {}", e);
-                    GetAccountsResponse::default()
+                    vec![]
                 }
             },
             Err(e) => {
                 error!("get_accounts request error: {}", e);
-                GetAccountsResponse::default()
+                vec![]
             }
         };
         body
