@@ -83,6 +83,11 @@ pub trait TDAmeritradeClientAccounts {
     async fn get_accounts(&self, token: &str) -> Vec<GetAccountsResponse>;
 }
 
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
+pub struct TDAmeritradeClientError {
+    pub error: String,
+}
+
 #[async_trait]
 impl TDAmeritradeClientAccounts for TDAmeritradeClient {
     async fn get_accounts(&self, token: &str) -> Vec<GetAccountsResponse> {

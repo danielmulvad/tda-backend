@@ -5,25 +5,15 @@ use serde::{Deserialize, Serialize};
 use std::env;
 use url::form_urlencoded;
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Default, Deserialize, Serialize)]
 pub struct TokenResponse {
-    pub access_token: String,
-    pub token_type: String,
-    pub expires_in: u64,
-    pub refresh_token: String,
-    pub scope: String,
-}
-
-impl Default for TokenResponse {
-    fn default() -> Self {
-        TokenResponse {
-            access_token: "".to_string(),
-            token_type: "".to_string(),
-            expires_in: 0,
-            refresh_token: "".to_string(),
-            scope: "".to_string(),
-        }
-    }
+    pub access_token: Option<String>,
+    pub token_type: Option<String>,
+    pub expires_in: Option<u64>,
+    pub refresh_token: Option<String>,
+    pub scope: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub error: Option<String>,
 }
 
 #[async_trait]

@@ -31,7 +31,10 @@ pub async fn auth_refresh_token(jar: CookieJar, State(state): State<AppState>, J
     };
     return (
         StatusCode::OK,
-        jar.add(create_access_token(token_response.clone())).add(create_refresh_token(token_response.clone())),
+        jar.add(create_access_token(token_response.clone())).add(create_refresh_token(TokenResponse {
+            refresh_token: Some(refresh_token.clone()),
+            ..token_response.clone()
+        })),
         Json(token_response),
     );
 }
