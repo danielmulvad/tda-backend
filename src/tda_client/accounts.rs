@@ -2,6 +2,41 @@ use super::TDAmeritradeClient;
 use async_trait::async_trait;
 use log::error;
 use serde::{Deserialize, Serialize};
+use std::fmt::{Display, Formatter, Result};
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(untagged)]
+pub enum SecuritiesAccount {
+    CashAccount(CashAccount),
+}
+
+impl Default for SecuritiesAccount {
+    fn default() -> Self {
+        SecuritiesAccount::CashAccount(CashAccount::default())
+    }
+}
+
+#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "UPPERCASE")]
+pub enum SecuritiesAccountType {
+    Cash,
+    Margin,
+}
+
+impl Default for SecuritiesAccountType {
+    fn default() -> Self {
+        SecuritiesAccountType::Cash
+    }
+}
+
+impl Display for SecuritiesAccountType {
+    fn fmt(&self, f: &mut Formatter<'_>) -> Result {
+        match self {
+            SecuritiesAccountType::Cash => write!(f, "CASH"),
+            SecuritiesAccountType::Margin => write!(f, "MARGIN"),
+        }
+    }
+}
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
@@ -11,7 +46,7 @@ pub struct GetAccountsResponse {
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
-pub struct SecuritiesAccount {
+pub struct CashAccount {
     pub account_id: String,
     pub current_balances: CurrentBalances,
     pub initial_balances: InitialBalances,
@@ -20,7 +55,7 @@ pub struct SecuritiesAccount {
     pub projected_balances: ProjectedBalances,
     pub round_trips: u64,
     #[serde(rename = "type")]
-    pub type_field: String,
+    pub type_field: SecuritiesAccountType,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
