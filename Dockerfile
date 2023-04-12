@@ -16,10 +16,9 @@ RUN cargo install --path . --target-dir ./target
 FROM debian:buster-slim
 
 COPY --from=builder /usr/src/tda-server /usr/local/bin/tda-server
+COPY --from=builder /usr/src/tda-server/.env /usr/local/bin/tda-server/target/release/.env
 
 WORKDIR /usr/local/bin/tda-server/target/release
-
-COPY /usr/local/bin/tda-server/.env ./.env
 
 RUN apt update && apt install pkg-config openssl libssl-dev ca-certificates -y
 
