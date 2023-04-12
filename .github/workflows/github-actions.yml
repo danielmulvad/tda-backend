@@ -26,3 +26,4 @@ jobs:
           secrets: |
             "PRIVATE_CERTIFICATE_CERT=${{ secrets.PRIVATE_CERTIFICATE_CERT }}"
             "PRIVATE_CERTIFICATE_KEY=${{ secrets.PRIVATE_CERTIFICATE_KEY }}"
+            "TDA_API_KEY=${{ secrets.TDA_API_KEY }}"
