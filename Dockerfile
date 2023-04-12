@@ -19,7 +19,7 @@ COPY --from=builder /usr/src/tda-server /usr/local/bin/tda-server
 
 WORKDIR /usr/local/bin/tda-server/target/release
 
-COPY /usr/src/tda-server/.env ./.env
+COPY /usr/local/bin/tda-server/.env ./.env
 
 RUN apt update && apt install pkg-config openssl libssl-dev ca-certificates -y
 
