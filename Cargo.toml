@@ -23,8 +23,11 @@ env_logger = { version = "0.10.0" }
 hyper = { version = "0.14", features = ["full"] }
 log = { version = "0.4.17" }
 reqwest = { version = "0.11", features = ["json"] }
+reqwest-middleware = { version = "0.2" }
+reqwest-retry = { version = "0.2" }
 serde = { version = "1.0", features = ["derive"] }
 serde_json = { version = "1.0" }
+task-local-extensions = { version = "0.1" }
 tokio = { version = "1.26", features = ["full"] }
 tower = { version = "0.4" }
 url = { version = "2.3" }

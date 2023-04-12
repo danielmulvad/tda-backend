@@ -11,6 +11,7 @@ impl Default for AppState {
     }
 }
 
+pub mod firebase_client;
 pub mod handlers;
 pub mod router;
 pub mod server;
