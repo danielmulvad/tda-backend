@@ -2,6 +2,8 @@ pub mod auth_callback_tda;
 pub use auth_callback_tda::auth_callback_tda;
 pub mod auth_refresh_token;
 pub use auth_refresh_token::auth_refresh_token;
+pub mod auth_sign_up_with_email_password;
+pub use auth_sign_up_with_email_password::auth_sign_up_with_email_password;
 pub mod get_accounts;
 pub use get_accounts::get_accounts;
 pub mod get_authorization_url;

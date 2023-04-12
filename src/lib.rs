@@ -1,12 +1,17 @@
+use firebase_client::FirebaseClient;
+use tda_client::TDAmeritradeClient;
+
 #[derive(Clone)]
 pub struct AppState {
-    tda_client: tda_client::TDAmeritradeClient,
+    firebase_client: FirebaseClient,
+    tda_client: TDAmeritradeClient,
 }
 
 impl Default for AppState {
     fn default() -> Self {
         AppState {
-            tda_client: tda_client::TDAmeritradeClient::new(),
+            firebase_client: FirebaseClient::new(),
+            tda_client: TDAmeritradeClient::new(),
         }
     }
 }
