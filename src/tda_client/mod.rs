@@ -1,5 +1,6 @@
 use reqwest::Client;
 use std::env;
+
 pub mod accounts;
 pub mod auth;
 
