@@ -54,12 +54,12 @@ pub struct FirebaseClientAuthenticationSignUpWithEmailPasswordResponse {
 #[derive(Debug, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FirebaseClientAuthenticationSignInWithEmailPasswordRequest {
-    email: String,
-    password: String,
-    return_secure_token: bool,
+    pub email: String,
+    pub password: String,
+    pub return_secure_token: bool,
 }
 
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FirebaseClientAuthenticationSignInWithEmailPasswordResponse {
     id_token: String,

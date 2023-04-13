@@ -11,7 +11,8 @@ impl Default for Router {
             .route("/", get(handlers::root))
             .route("/auth/providers/tda", get(handlers::get_authorization_url))
             .route("/auth/providers/tda", post(handlers::auth_refresh_token))
-            .route("/auth/register/tradetracker", post(handlers::auth_sign_up_with_email_password))
+            .route("/auth/providers/tradetracker/signup", post(handlers::auth_sign_up_with_email_password))
+            .route("/auth/providers/tradetracker/signin", post(handlers::auth_sign_in_with_email_password))
             .route("/auth/callback/tda", get(handlers::auth_callback_tda))
             .route("/get_accounts", get(handlers::get_accounts));
         let router = axum::Router::new().nest("/api", api).with_state(state);

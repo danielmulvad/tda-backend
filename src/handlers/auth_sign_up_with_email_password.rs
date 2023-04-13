@@ -6,7 +6,6 @@ use crate::{
     AppState,
 };
 use axum::{extract::State, response::IntoResponse, Json};
-use axum_macros::debug_handler;
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 
@@ -16,7 +15,6 @@ pub struct AuthSignUpWithEmailPasswordRequest {
     password: String,
 }
 
-#[debug_handler]
 pub async fn auth_sign_up_with_email_password(state: State<AppState>, json: Json<AuthSignUpWithEmailPasswordRequest>) -> impl IntoResponse {
     let sign_up_args = FirebaseClientAuthenticationSignUpWithEmailPasswordRequest {
         email: json.email.clone(),
