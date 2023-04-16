@@ -8,7 +8,7 @@ COPY ./Cargo.lock ./Cargo.lock
 COPY ./src/ ./src/
 
 # Set up environment variables
-RUN echo "LOG_LEVEL=ERROR" > .env
+RUN echo "LOG_LEVEL=DEBUG" > .env
 RUN echo "TDA_API_BASE_URL=https://tradetracker.dmulvad.com" >> .env
 RUN echo "TDA_API_CALLBACK_URL=https://tradetracker.dmulvad.com/api/auth/callback/tda" >> .env
 RUN --mount=type=secret,id=TDA_API_KEY awk '{print "\nTDA_API_KEY="$1}' /run/secrets/TDA_API_KEY >> .env
