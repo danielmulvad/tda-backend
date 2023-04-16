@@ -110,6 +110,9 @@ pub async fn auth_sign_up_with_email_password(state: State<AppState>, json: Json
     let token_response = state.firebase_client.sign_up_with_email_password(sign_up_args).await;
     match token_response {
         Ok(response) => (StatusCode::OK, Json(response)),
-        Err(_) => (StatusCode::BAD_REQUEST, Json(auth::FirebaseClientAuthenticationSignUpWithEmailPasswordResponse::default())),
+        Err(e) => {
+            debug!("failed to sign up with email and password: {:?}", e);
+            (StatusCode::BAD_REQUEST, Json(auth::FirebaseClientAuthenticationSignUpWithEmailPasswordResponse::default()))
+        }
     }
 }
