@@ -60,14 +60,14 @@ pub async fn verify_cf_response(body: &Json<AuthSignUpWithEmailPasswordRequest>)
     let response = match response {
         Ok(response) => response,
         Err(_) => {
-            debug!("failed to send cf_turnstile_response: {}", body.cf_turnstile_response);
+            log::debug!("failed to send cf_turnstile_response: {}", body.cf_turnstile_response);
             return false;
         }
     };
     let cf_text = match response.text().await {
         Ok(text) => text,
         Err(_) => {
-            debug!("failed to read cf_turnstile_response: {}", body.cf_turnstile_response);
+            log::debug!("failed to read cf_turnstile_response: {}", body.cf_turnstile_response);
             return false;
         }
     };
@@ -75,7 +75,7 @@ pub async fn verify_cf_response(body: &Json<AuthSignUpWithEmailPasswordRequest>)
         Ok(json) => json,
         Err(_) => {
             return {
-                debug!("failed to parse cf_turnstile_response: {}", cf_text);
+                log::debug!("failed to parse cf_turnstile_response: {}", cf_text);
                 false
             }
         }
@@ -83,7 +83,7 @@ pub async fn verify_cf_response(body: &Json<AuthSignUpWithEmailPasswordRequest>)
     match json {
         SiteVerifyResponse::Success(s) => s.success,
         SiteVerifyResponse::Error(e) => {
-            debug!("failed to verify cf_turnstile_response: {:?}", e);
+            log::debug!("failed to verify cf_turnstile_response: {:?}", e);
             return false;
         }
     }
