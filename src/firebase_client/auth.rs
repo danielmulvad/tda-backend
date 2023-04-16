@@ -1,5 +1,6 @@
-use super::FirebaseClient;
+use super::{FirebaseClient, FirebaseErrorResponse};
 use async_trait::async_trait;
+use log::debug;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -41,14 +42,27 @@ pub struct FirebaseClientAuthenticationSignUpWithEmailPasswordRequest {
     pub return_secure_token: bool,
 }
 
-#[derive(Debug, Default, Deserialize, Serialize)]
+#[derive(Debug, Default, Deserialize, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
-pub struct FirebaseClientAuthenticationSignUpWithEmailPasswordResponse {
+pub struct FirebaseClientAuthenticationSignUpWithEmailPasswordResponseSuccess {
     id_token: String,
     email: String,
     refresh_token: String,
     expires_in: String,
     local_id: String,
+}
+
+#[derive(Debug, Deserialize, Serialize, PartialEq, Eq)]
+#[serde(untagged)]
+pub enum FirebaseClientAuthenticationSignUpWithEmailPasswordResponse {
+    Success(FirebaseClientAuthenticationSignUpWithEmailPasswordResponseSuccess),
+    Error(FirebaseErrorResponse),
+}
+
+impl Default for FirebaseClientAuthenticationSignUpWithEmailPasswordResponse {
+    fn default() -> Self {
+        FirebaseClientAuthenticationSignUpWithEmailPasswordResponse::Success(FirebaseClientAuthenticationSignUpWithEmailPasswordResponseSuccess::default())
+    }
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -85,10 +99,7 @@ pub trait FirebaseClientAuthentication {
         request: FirebaseClientAuthenticationLoginWithRefreshTokenRequest,
     ) -> Result<FirebaseClientAuthenticationLoginWithRefreshTokenResponse, Box<dyn std::error::Error>>;
 
-    async fn sign_up_with_email_password(
-        &self,
-        request: FirebaseClientAuthenticationSignUpWithEmailPasswordRequest,
-    ) -> Result<FirebaseClientAuthenticationSignUpWithEmailPasswordResponse, Box<dyn std::error::Error>>;
+    async fn sign_up_with_email_password(&self, request: FirebaseClientAuthenticationSignUpWithEmailPasswordRequest) -> FirebaseClientAuthenticationSignUpWithEmailPasswordResponse;
 
     async fn sign_in_with_email_password(
         &self,
@@ -118,14 +129,30 @@ impl FirebaseClientAuthentication for FirebaseClient {
         Ok(json)
     }
 
-    async fn sign_up_with_email_password(
-        &self,
-        request: FirebaseClientAuthenticationSignUpWithEmailPasswordRequest,
-    ) -> Result<FirebaseClientAuthenticationSignUpWithEmailPasswordResponse, Box<dyn std::error::Error>> {
+    async fn sign_up_with_email_password(&self, request: FirebaseClientAuthenticationSignUpWithEmailPasswordRequest) -> FirebaseClientAuthenticationSignUpWithEmailPasswordResponse {
         let url = format!("{}/accounts:signUp?key={}", self.base_url, self.api_key);
-        let response = self.client.post(&url).json(&request).send().await?;
-        let json = response.json::<FirebaseClientAuthenticationSignUpWithEmailPasswordResponse>().await?;
-        Ok(json)
+        let response = match self.client.post(&url).json(&request).send().await {
+            Ok(response) => response,
+            Err(e) => {
+                debug!("Request Error: {}", e);
+                return FirebaseClientAuthenticationSignUpWithEmailPasswordResponse::default();
+            }
+        };
+        let string = match response.text().await {
+            Ok(string) => string,
+            Err(e) => {
+                debug!("String Error: {}", e);
+                return FirebaseClientAuthenticationSignUpWithEmailPasswordResponse::default();
+            }
+        };
+        let json: FirebaseClientAuthenticationSignUpWithEmailPasswordResponse = match serde_json::from_str(&string) {
+            Ok(json) => json,
+            Err(e) => {
+                debug!("Json Error ({}): {}", string, e);
+                return FirebaseClientAuthenticationSignUpWithEmailPasswordResponse::default();
+            }
+        };
+        json
     }
 
     async fn sign_in_with_email_password(
