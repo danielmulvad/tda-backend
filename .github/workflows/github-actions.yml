@@ -24,6 +24,7 @@ jobs:
           push: true
           tags: ${{ secrets.DOCKERHUB_USERNAME }}/tda:backend-latest
           secrets: |
+            "CLOUDFLARE_TURNSTILE_SECRET_KEY=${{ secrets.CLOUDFLARE_TURNSTILE_SECRET_KEY }}"
             "FIREBASE_API_KEY=${{ secrets.FIREBASE_API_KEY }}"
             "PRIVATE_CERTIFICATE_CERT=${{ secrets.PRIVATE_CERTIFICATE_CERT }}"
             "PRIVATE_CERTIFICATE_KEY=${{ secrets.PRIVATE_CERTIFICATE_KEY }}"
