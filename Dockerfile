@@ -17,6 +17,10 @@ RUN --mount=type=secret,id=CLOUDFLARE_TURNSTILE_SECRET_KEY awk '{print "\nCLOUDF
 
 # Install dependencies
 RUN apt update && apt install pkg-config openssl libssl-dev ca-certificates -y
+
+# https://planetscale.com/docs/concepts/secure-connections#ca-root-configuration
+RUN echo "MYSQL_ATTR_SSL_CA=/etc/ssl/certs/ca-certificates.crt" >> .env
+
 RUN cargo install --path . --target-dir ./target
 
 # Runner

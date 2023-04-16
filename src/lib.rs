@@ -1,21 +1,28 @@
+use database_client::DatabaseClient;
 use firebase_client::FirebaseClient;
 use tda_client::TDAmeritradeClient;
 
 #[derive(Clone)]
 pub struct AppState {
+    _database_client: DatabaseClient,
     firebase_client: FirebaseClient,
     tda_client: TDAmeritradeClient,
 }
 
-impl Default for AppState {
-    fn default() -> Self {
-        AppState {
-            firebase_client: FirebaseClient::new(),
-            tda_client: TDAmeritradeClient::new(),
+impl AppState {
+    pub fn new() -> Self {
+        let firebase_client = FirebaseClient::new();
+        let tda_client = TDAmeritradeClient::new();
+        let database_client = DatabaseClient::new();
+        Self {
+            _database_client: database_client,
+            firebase_client,
+            tda_client,
         }
     }
 }
 
+pub mod database_client;
 pub mod firebase_client;
 pub mod handlers;
 pub mod middleware;

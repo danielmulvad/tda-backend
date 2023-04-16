@@ -22,6 +22,7 @@ dotenv = { version = "0.15" }
 env_logger = { version = "0.10.0" }
 hyper = { version = "0.14", features = ["full"] }
 log = { version = "0.4.17" }
+mysql = { version = "23.0" }
 reqwest = { version = "0.11", features = ["json"] }
 reqwest-middleware = { version = "0.2" }
 reqwest-retry = { version = "0.2" }

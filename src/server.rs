@@ -5,15 +5,10 @@ use std::net::SocketAddr;
 pub struct Server {}
 
 impl Server {
-    pub async fn start(&self, router: Option<axum::Router>) {
-        let app = match router {
-            Some(router) => router,
-            None => Router::default().get_router(),
-        };
-
+    pub async fn start(&self, router: Router) {
         let addr = SocketAddr::from(([0, 0, 0, 0], 3000));
         info!("Listening on {}", addr);
-        axum::Server::bind(&addr).serve(app.into_make_service()).await.unwrap()
+        axum::Server::bind(&addr).serve(router.get_router().into_make_service()).await.unwrap()
     }
 
     pub fn new() -> Self {
