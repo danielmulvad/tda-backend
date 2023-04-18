@@ -17,7 +17,7 @@ pub struct AuthRefreshTokenBody {
     refresh_token: String,
 }
 
-pub async fn auth_refresh_token(jar: CookieJar, State(state): State<AppState>, Json(json): Json<AuthRefreshTokenBody>) -> impl IntoResponse {
+pub async fn auth_tda_refresh_token(jar: CookieJar, State(state): State<AppState>, Json(json): Json<AuthRefreshTokenBody>) -> impl IntoResponse {
     let refresh_token = json.refresh_token;
     let token_response = match state.tda_client.exchange_refresh_token_for_token(&refresh_token).await {
         Ok(data) => {
@@ -29,12 +29,9 @@ pub async fn auth_refresh_token(jar: CookieJar, State(state): State<AppState>, J
             return (StatusCode::INTERNAL_SERVER_ERROR, jar, Json(TokenResponse::default()));
         }
     };
-    return (
-        StatusCode::OK,
-        jar.add(create_access_token(token_response.clone())).add(create_refresh_token(TokenResponse {
-            refresh_token: Some(refresh_token.clone()),
-            ..token_response.clone()
-        })),
-        Json(token_response),
-    );
+    let cloned_token_response = token_response.clone();
+    let access_token = cloned_token_response.access_token.unwrap_or_default();
+    let refresh_token = cloned_token_response.refresh_token.unwrap_or_default();
+    let jar = jar.add(create_access_token(access_token)).add(create_refresh_token(refresh_token));
+    return (StatusCode::OK, jar, Json(token_response));
 }

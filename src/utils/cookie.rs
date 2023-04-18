@@ -1,4 +1,3 @@
-use crate::tda_client::auth::TokenResponse;
 use cookie::{
     time::{Duration, OffsetDateTime},
     Cookie, Expiration, SameSite,
@@ -37,16 +36,16 @@ where
     cookie
 }
 
-pub fn create_access_token(token: TokenResponse) -> Cookie<'static> {
+pub fn create_access_token(access_token: String) -> Cookie<'static> {
     let access_token_expires = OffsetDateTime::now_utc().checked_add(Duration::minutes(30)).unwrap();
-    let mut cookie = create_cookie("access_token", token.access_token.unwrap_or_default());
+    let mut cookie = create_cookie("access_token", access_token);
     cookie.set_expires(Expiration::DateTime(access_token_expires));
     cookie
 }
 
-pub fn create_refresh_token(token: TokenResponse) -> Cookie<'static> {
+pub fn create_refresh_token(refresh_token: String) -> Cookie<'static> {
     let refresh_token_expires = OffsetDateTime::now_utc().checked_add(Duration::minutes(30)).unwrap();
-    let mut cookie = create_cookie("refresh_token", token.refresh_token.unwrap_or_default());
+    let mut cookie = create_cookie("refresh_token", refresh_token);
     cookie.set_expires(Expiration::DateTime(refresh_token_expires));
     cookie
 }
