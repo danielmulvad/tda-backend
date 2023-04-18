@@ -1,4 +1,10 @@
-use crate::{handlers, middleware, AppState};
+use crate::{
+    handlers::{
+        self,
+        providers::{tda, tradetracker},
+    },
+    middleware, AppState,
+};
 use axum::routing::{get, post};
 
 pub struct Router {
@@ -19,16 +25,16 @@ impl Router {
 
     pub fn new(app_state: AppState) -> Self {
         let private_routes = axum::Router::<AppState>::new()
-            .route("/get_accounts", get(handlers::get_accounts))
-            .route("/auth/providers/tda", get(handlers::get_authorization_url))
+            .route("/get_accounts", get(tda::get_accounts))
+            .route("/auth/providers/tda", get(tda::auth::get_authorization_url))
+            .route("/auth/providers/tda", post(tda::auth_tda_refresh_token))
+            .route("/auth/callback/tda", get(tda::auth::callback::tda))
             .route_layer(axum::middleware::from_fn_with_state(app_state.clone(), middleware::jwt::auth));
         let public_routes = axum::Router::new()
             .route("/", get(handlers::root))
-            .route("/auth/providers/tradetracker", post(handlers::auth_tradetracker_refresh_token))
-            .route("/auth/providers/tda", post(handlers::auth_tda_refresh_token))
-            .route("/auth/providers/tradetracker/signup", post(handlers::auth_sign_up_with_email_password))
-            .route("/auth/providers/tradetracker/signin", post(handlers::auth_sign_in_with_email_password))
-            .route("/auth/callback/tda", get(handlers::auth_callback_tda));
+            .route("/auth/providers/tradetracker", post(tradetracker::auth::auth_tradetracker_refresh_token))
+            .route("/auth/providers/tradetracker/signup", post(tradetracker::auth::auth_sign_up_with_email_password))
+            .route("/auth/providers/tradetracker/signin", post(tradetracker::auth::auth_sign_in_with_email_password));
         let api = public_routes.merge(private_routes);
         let router = axum::Router::new().nest("/api", api).with_state(app_state);
         Self { router }

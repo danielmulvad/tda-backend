@@ -1,4 +1,4 @@
-use crate::handlers::auth_sign_up_with_email_password::AuthSignUpWithEmailPasswordRequest;
+use crate::handlers::providers::tradetracker::auth::sign_up::AuthSignUpWithEmailPasswordRequest;
 use axum::{middleware::Next, response::Response, Json};
 use hyper::Request;
 use serde::{Deserialize, Serialize};

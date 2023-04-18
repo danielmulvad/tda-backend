@@ -18,7 +18,7 @@ pub struct AuthCallbackTdaQuery {
     code: String,
 }
 
-pub async fn auth_callback_tda(jar: CookieJar, State(state): State<AppState>, Query(query): Query<AuthCallbackTdaQuery>) -> impl IntoResponse {
+pub async fn tda(jar: CookieJar, State(state): State<AppState>, Query(query): Query<AuthCallbackTdaQuery>) -> impl IntoResponse {
     let code = &query.code;
     let base_url = get_base_url();
     let token_response = match state.tda_client.exchange_authorization_code_for_token(code).await {
