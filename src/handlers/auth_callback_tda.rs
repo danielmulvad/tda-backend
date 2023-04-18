@@ -31,8 +31,8 @@ pub async fn auth_callback_tda(jar: CookieJar, State(state): State<AppState>, Qu
             return (jar, Redirect::permanent(base_url.as_str()));
         }
     };
-    (
-        jar.add(create_access_token(token_response.clone())).add(create_refresh_token(token_response)),
-        Redirect::permanent(base_url.as_str()),
-    )
+    let access_token = token_response.access_token.unwrap_or_default();
+    let refresh_token = token_response.refresh_token.unwrap_or_default();
+    let jar = jar.add(create_access_token(access_token)).add(create_refresh_token(refresh_token));
+    (jar, Redirect::permanent(base_url.as_str()))
 }

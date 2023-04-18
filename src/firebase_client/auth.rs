@@ -1,3 +1,5 @@
+use crate::middleware::jwt::TokenClaims;
+
 use super::{FirebaseClient, FirebaseErrorResponse};
 use async_trait::async_trait;
 use log::debug;
@@ -78,10 +80,7 @@ pub struct FirebaseClientAuthenticationSignInWithEmailPasswordRequest {
 pub struct FirebaseClientAuthenticationSignInWithEmailPasswordResponse {
     id_token: String,
     email: String,
-    refresh_token: String,
-    expires_in: String,
-    local_id: String,
-    registered: bool,
+    jwt: TokenClaims,
 }
 
 /*

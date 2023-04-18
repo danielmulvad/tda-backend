@@ -17,11 +17,12 @@ axum-extra = { version = "0.7", features = [
 axum-macros = { version = "0.3" }
 axum-server = { version = "0.4", features = ["tls-rustls"] }
 axum-test = { version = "7.0" }
+chrono = { version = "0.4" }
 cookie = { version = "0.17", features = ["secure", "percent-encode"] }
 dotenv = { version = "0.15" }
 env_logger = { version = "0.10.0" }
 hyper = { version = "0.14", features = ["full"] }
-jwt = { version = "0.16" }
+jsonwebtoken = { version = "8.2" }
 log = { version = "0.4.17" }
 mysql = { version = "23.0" }
 reqwest = { version = "0.11", features = ["json"] }
