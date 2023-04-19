@@ -29,7 +29,7 @@ RUN groupadd $APP_USER \
     && useradd -g $APP_USER $APP_USER \
     && mkdir -p ${APP}
 
-COPY --from=builder /tradetracker/target/release/tda-server ${APP}/tradetracker
+COPY --from=builder /tradetracker/target/release/tda-server ${APP}/tda-server
 
 RUN chown -R $APP_USER:$APP_USER ${APP}
 
