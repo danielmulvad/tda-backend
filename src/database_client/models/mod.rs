@@ -16,22 +16,32 @@ impl FromRow for User {
     where
         Self: Sized,
     {
-        let (id, email, created_at, updated_at) = mysql::from_row(row);
-        User { id, email, created_at, updated_at }
+        let (id, email, created_at, updated_at) = mysql::from_row::<(Vec<u8>, String, NaiveDateTime, NaiveDateTime)>(row);
+        User {
+            id: Uuid::from_slice(&id).expect("Error converting id to Uuid"),
+            email,
+            created_at,
+            updated_at,
+        }
     }
 
     fn from_row_opt(row: mysql::Row) -> Result<Self, mysql::FromRowError>
     where
         Self: Sized,
     {
-        let (id, email, created_at, updated_at) = mysql::from_row_opt(row)?;
-        Ok(User { id, email, created_at, updated_at })
+        let (id, email, created_at, updated_at) = mysql::from_row_opt::<(Vec<u8>, String, NaiveDateTime, NaiveDateTime)>(row)?;
+        Ok(User {
+            id: Uuid::from_slice(&id).expect("Error converting id to Uuid"),
+            email,
+            created_at,
+            updated_at,
+        })
     }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct UserAuth {
-    pub user_id: String,
+    pub user_id: Uuid,
     pub password_hash: String,
     pub created_at: NaiveDateTime,
     pub updated_at: NaiveDateTime,
@@ -42,9 +52,9 @@ impl FromRow for UserAuth {
     where
         Self: Sized,
     {
-        let (user_id, password_hash, created_at, updated_at) = mysql::from_row(row);
+        let (user_id, password_hash, created_at, updated_at) = mysql::from_row::<(Vec<u8>, String, NaiveDateTime, NaiveDateTime)>(row);
         UserAuth {
-            user_id,
+            user_id: Uuid::from_slice(&user_id).expect("Error converting user_id to Uuid"),
             password_hash,
             created_at,
             updated_at,
@@ -55,9 +65,9 @@ impl FromRow for UserAuth {
     where
         Self: Sized,
     {
-        let (user_id, password_hash, created_at, updated_at) = mysql::from_row_opt(row)?;
+        let (user_id, password_hash, created_at, updated_at) = mysql::from_row_opt::<(Vec<u8>, String, NaiveDateTime, NaiveDateTime)>(row)?;
         Ok(UserAuth {
-            user_id,
+            user_id: Uuid::from_slice(&user_id).expect("Error converting user_id to Uuid"),
             password_hash,
             created_at,
             updated_at,
