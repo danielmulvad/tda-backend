@@ -9,7 +9,6 @@
 !src/**
 
 # Dotfiles
-!.env
 !.gitignore
 
 # Other Files
