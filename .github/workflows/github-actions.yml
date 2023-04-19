@@ -31,3 +31,4 @@ jobs:
             "TDA_API_KEY=${{ secrets.TDA_API_KEY }}"
             "JWT_ACCESS_TOKEN_SECRET=${{ secrets.JWT_ACCESS_TOKEN_SECRET }}"
             "JWT_REFRESH_TOKEN_SECRET=${{ secrets.JWT_REFRESH_TOKEN_SECRET }}"
+            "DATABASE_URL=${{ secrets.DATABASE_URL }}"
