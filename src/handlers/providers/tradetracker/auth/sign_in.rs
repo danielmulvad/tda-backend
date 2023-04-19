@@ -1,26 +1,46 @@
 use crate::{
-    firebase_client::auth::{FirebaseClientAuthentication, FirebaseClientAuthenticationSignInWithEmailPasswordRequest, FirebaseClientAuthenticationSignInWithEmailPasswordResponse},
+    middleware::jwt::{create_access_token, create_refresh_token},
     AppState,
 };
+use argon2::{Argon2, PasswordHash, PasswordVerifier};
 use axum::{extract::State, response::IntoResponse, Json};
 use hyper::StatusCode;
 use serde::{Deserialize, Serialize};
 
-#[derive(Deserialize, Serialize)]
+#[derive(Deserialize)]
 pub struct AuthSignInWithEmailPasswordRequest {
     email: String,
     password: String,
 }
 
-pub async fn auth_sign_in_with_email_password(state: State<AppState>, json: Json<AuthSignInWithEmailPasswordRequest>) -> impl IntoResponse {
-    let sign_in_args = FirebaseClientAuthenticationSignInWithEmailPasswordRequest {
-        email: json.email.clone(),
-        password: json.password.clone(),
-        return_secure_token: true,
+fn verify_password(password: String, password_hash: String) -> bool {
+    let parsed_hash = PasswordHash::new(&password_hash);
+    let parsed_hash = match parsed_hash {
+        Ok(hash) => hash,
+        Err(_) => {
+            return false;
+        }
     };
-    let token_response = state.firebase_client.sign_in_with_email_password(sign_in_args).await;
-    match token_response {
-        Ok(response) => (StatusCode::OK, Json(response)),
-        Err(_) => (StatusCode::BAD_REQUEST, Json(FirebaseClientAuthenticationSignInWithEmailPasswordResponse::default())),
+    Argon2::default().verify_password(password.as_bytes(), &parsed_hash).is_ok()
+}
+
+#[derive(Default, Serialize)]
+pub struct AuthSignInWithEmailPasswordResponse {
+    pub access_token: String,
+    pub refresh_token: String,
+}
+
+pub async fn auth_sign_in_with_email_password(state: State<AppState>, json: Json<AuthSignInWithEmailPasswordRequest>) -> impl IntoResponse {
+    let db_user_auth = state.database_client.get_user_auth_by_email(json.email.as_str());
+    if db_user_auth.is_none() {
+        return (StatusCode::BAD_REQUEST, Json(AuthSignInWithEmailPasswordResponse::default()));
     }
+    let db_user_auth = db_user_auth.unwrap();
+    let ok = verify_password(json.password.clone(), db_user_auth.password_hash);
+    if !ok {
+        return (StatusCode::BAD_REQUEST, Json(AuthSignInWithEmailPasswordResponse::default()));
+    }
+    let access_token = create_access_token(state.env.jwt_access_token_secret.as_str());
+    let refresh_token = create_refresh_token(state.env.jwt_refresh_token_secret.as_str());
+    (StatusCode::OK, Json(AuthSignInWithEmailPasswordResponse { access_token, refresh_token }))
 }
