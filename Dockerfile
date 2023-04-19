@@ -1,13 +1,11 @@
-# Builder
-FROM rust:1.68-slim as builder
+FROM rust:1.68-slim-buster as builder
 
-WORKDIR /usr/src/tda-server
+RUN USER=root
 
-COPY ./Cargo.toml ./Cargo.toml
-COPY ./Cargo.lock ./Cargo.lock
-COPY ./src/ ./src/
+RUN mkdir tradetracker
+WORKDIR /tradetracker
+ADD . ./
 
-# Set up environment variables
 RUN echo "LOG_LEVEL=DEBUG" > .env
 RUN echo "TDA_API_BASE_URL=https://tradetracker.dmulvad.com" >> .env
 RUN echo "TDA_API_CALLBACK_URL=https://tradetracker.dmulvad.com/api/auth/callback/tda" >> .env
@@ -17,24 +15,24 @@ RUN --mount=type=secret,id=CLOUDFLARE_TURNSTILE_SECRET_KEY awk '{print "\nCLOUDF
 RUN --mount=type=secret,id=JWT_ACCESS_TOKEN_SECRET awk '{print "\nJWT_ACCESS_TOKEN_SECRET="$1}' /run/secrets/JWT_ACCESS_TOKEN_SECRET >> .env
 RUN --mount=type=secret,id=JWT_REFRESH_TOKEN_SECRET awk '{print "\nJWT_REFRESH_TOKEN_SECRET="$1}' /run/secrets/JWT_REFRESH_TOKEN_SECRET >> .env
 
-# Install dependencies
-RUN apt update && apt install pkg-config openssl libssl-dev ca-certificates -y
+RUN cargo clean && \
+    cargo build -vv --release
 
-# https://planetscale.com/docs/concepts/secure-connections#ca-root-configuration
-RUN echo "MYSQL_ATTR_SSL_CA=/etc/ssl/certs/ca-certificates.crt" >> .env
-
-RUN cargo install --path . --target-dir ./target
-
-# Runner
 FROM debian:buster-slim
 
-COPY --from=builder /usr/src/tda-server /usr/local/bin/tda-server
-COPY --from=builder /usr/src/tda-server/.env /usr/local/bin/tda-server/target/release/.env
+ARG APP=/usr/src/app
 
-WORKDIR /usr/local/bin/tda-server/target/release
+ENV APP_USER=appuser
 
-RUN apt update && apt install pkg-config openssl libssl-dev ca-certificates -y
+RUN groupadd $APP_USER \
+    && useradd -g $APP_USER $APP_USER \
+    && mkdir -p ${APP}
 
-EXPOSE 3000
+COPY --from=builder /tradetracker/target/release/tradetracker ${APP}/tradetracker
 
-ENTRYPOINT ["./tda-server"]
+RUN chown -R $APP_USER:$APP_USER ${APP}
+
+USER $APP_USER
+WORKDIR ${APP}
+
+CMD ["./tda-server"]
