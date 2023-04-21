@@ -43,9 +43,21 @@ pub fn create_access_token(access_token: String) -> Cookie<'static> {
     cookie
 }
 
+pub fn delete_access_token() -> Cookie<'static> {
+    let mut cookie = create_cookie("access_token", "");
+    cookie.set_expires(Expiration::DateTime(OffsetDateTime::now_utc()));
+    cookie
+}
+
 pub fn create_refresh_token(refresh_token: String) -> Cookie<'static> {
     let refresh_token_expires = OffsetDateTime::now_utc().checked_add(Duration::minutes(30)).unwrap();
     let mut cookie = create_cookie("refresh_token", refresh_token);
     cookie.set_expires(Expiration::DateTime(refresh_token_expires));
+    cookie
+}
+
+pub fn delete_refresh_token() -> Cookie<'static> {
+    let mut cookie = create_cookie("refresh_token", "");
+    cookie.set_expires(Expiration::DateTime(OffsetDateTime::now_utc()));
     cookie
 }
