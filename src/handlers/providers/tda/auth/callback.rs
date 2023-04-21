@@ -28,11 +28,11 @@ pub async fn tda(jar: CookieJar, State(state): State<AppState>, Query(query): Qu
         }
         Err(e) => {
             error!("auth_callback_tda error: {}", e);
-            return (jar, Redirect::permanent(base_url.as_str()));
+            return (jar, Redirect::temporary(base_url.as_str()));
         }
     };
     let access_token = token_response.access_token.unwrap_or_default();
     let refresh_token = token_response.refresh_token.unwrap_or_default();
     let jar = jar.add(create_access_token(access_token)).add(create_refresh_token(refresh_token));
-    (jar, Redirect::permanent(base_url.as_str()))
+    (jar, Redirect::temporary(base_url.as_str()))
 }
