@@ -126,7 +126,6 @@ pub struct TDAmeritradeClientError {
 #[async_trait]
 impl TDAmeritradeClientAccounts for TDAmeritradeClient {
     async fn get_accounts(&self, token: &str) -> Vec<GetAccountsResponse> {
-        format!("token: {}", token);
         let url = format!("{}/accounts", self.base_url);
         let request = self.client.get(&url).bearer_auth(token).send().await;
         let body = match request {

@@ -35,7 +35,7 @@ impl Router {
             .route("/auth/providers/tradetracker", post(tradetracker::auth::auth_tradetracker_refresh_token))
             .route("/auth/providers/tradetracker/signup", post(tradetracker::auth::auth_sign_up_with_email_password))
             .route("/auth/providers/tradetracker/signin", post(tradetracker::auth::auth_sign_in_with_email_password))
-            .route("/auth/providers/tradetracker/signout", get(tradetracker::auth::auth_sign_out));
+            .route("/auth/providers/tradetracker/signout", post(tradetracker::auth::auth_sign_out));
         let api = public_routes.merge(private_routes);
         let router = axum::Router::new().nest("/api", api).with_state(app_state);
         Self { router }

@@ -31,8 +31,12 @@ pub async fn tda(jar: CookieJar, State(state): State<AppState>, Query(query): Qu
             return (jar, Redirect::temporary(base_url.as_str()));
         }
     };
-    let access_token = token_response.access_token.unwrap_or_default();
-    let refresh_token = token_response.refresh_token.unwrap_or_default();
-    let jar = jar.add(create_access_token(access_token)).add(create_refresh_token(refresh_token));
+    let access_token_str = token_response.access_token.unwrap_or_default();
+    let refresh_token_str = token_response.refresh_token.unwrap_or_default();
+    let mut access_token = create_access_token(access_token_str);
+    access_token.set_name("access_token_tda");
+    let mut refresh_token = create_refresh_token(refresh_token_str);
+    refresh_token.set_name("refresh_token_tda");
+    let jar = jar.add(access_token).add(refresh_token);
     (jar, Redirect::temporary(base_url.as_str()))
 }

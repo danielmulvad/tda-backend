@@ -4,7 +4,7 @@ use axum_extra::extract::CookieJar;
 use hyper::StatusCode;
 
 pub async fn get_accounts(jar: CookieJar, State(state): State<AppState>) -> impl IntoResponse {
-    let access_token_cookie = jar.get("access_token");
+    let access_token_cookie = jar.get("access_token_tda");
     let token = match access_token_cookie {
         Some(cookie) => cookie.value(),
         None => return (StatusCode::UNAUTHORIZED, Json(vec![])),
