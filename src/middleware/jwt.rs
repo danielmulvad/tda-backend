@@ -75,11 +75,11 @@ fn get_token<B>(name: &str, cookie_jar: &CookieJar, req: &Request<B>) -> Option<
 pub async fn auth<B>(cookie_jar: CookieJar, State(state): State<AppState>, req: Request<B>, next: Next<B>) -> impl IntoResponse {
     let token = match get_token("access_token", &cookie_jar, &req) {
         Some(token) => token,
-        None => return StatusCode::UNAUTHORIZED.into_response(),
+        None => return StatusCode::IM_A_TEAPOT.into_response(),
     };
     match validate_token(&token, &state.env.jwt_access_token_secret) {
         Ok(claims) => claims,
-        Err(_) => return StatusCode::UNAUTHORIZED.into_response(),
+        Err(_) => return StatusCode::IM_A_TEAPOT.into_response(),
     };
     next.run(req).await
 }

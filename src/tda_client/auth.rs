@@ -1,6 +1,6 @@
 use super::TDAmeritradeClient;
 use async_trait::async_trait;
-use log::{debug, error};
+use log::error;
 use serde::{Deserialize, Serialize};
 use std::env;
 use url::form_urlencoded;
@@ -52,10 +52,7 @@ impl TDAmeritradeClientAuth for TDAmeritradeClient {
 
         let res = self.client.post(&url).form(&params).send().await;
         match res {
-            Ok(data) => {
-                debug!("exchange_authorization_code_for_token data: {:?}", data);
-                data.json::<TokenResponse>().await
-            }
+            Ok(data) => data.json::<TokenResponse>().await,
             Err(e) => {
                 error!("exchange_authorization_code_for_token error: {}", e);
                 Err(e)
@@ -69,10 +66,7 @@ impl TDAmeritradeClientAuth for TDAmeritradeClient {
 
         let res = self.client.post(&url).form(&params).send().await;
         match res {
-            Ok(data) => {
-                debug!("exchange_refresh_token_for_token data: {:?}", data);
-                data.json::<TokenResponse>().await
-            }
+            Ok(data) => data.json::<TokenResponse>().await,
             Err(e) => {
                 error!("exchange_refresh_token_for_token error: {}", e);
                 Err(e)

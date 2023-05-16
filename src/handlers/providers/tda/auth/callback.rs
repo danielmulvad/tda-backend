@@ -11,7 +11,7 @@ use axum::{
     response::{IntoResponse, Redirect},
 };
 use axum_extra::extract::cookie::CookieJar;
-use log::{debug, error};
+use log::error;
 
 #[derive(serde::Deserialize)]
 pub struct AuthCallbackTdaQuery {
@@ -22,10 +22,7 @@ pub async fn tda(jar: CookieJar, State(state): State<AppState>, Query(query): Qu
     let code = &query.code;
     let base_url = get_base_url();
     let token_response = match state.tda_client.exchange_authorization_code_for_token(code).await {
-        Ok(data) => {
-            debug!("auth_callback_tda data: {:?}", data);
-            data
-        }
+        Ok(data) => data,
         Err(e) => {
             error!("auth_callback_tda error: {}", e);
             return (jar, Redirect::temporary(base_url.as_str()));

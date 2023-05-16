@@ -45,7 +45,6 @@ pub async fn verify_cf_response(_: &Json<AuthSignUpWithEmailPasswordRequest>) ->
 #[cfg(not(debug_assertions))]
 pub async fn verify_cf_response(body: &Json<AuthSignUpWithEmailPasswordRequest>) -> bool {
     let secret = std::env::var("CLOUDFLARE_TURNSTILE_SECRET_KEY").expect("CLOUDFLARE_TURNSTILE_SECRET_KEY not found in .env");
-    log::debug!("secret {}", secret);
     let cf_body = SiteVerifyBody {
         response: body.cf_turnstile_response.to_owned(),
         secret,
@@ -60,14 +59,14 @@ pub async fn verify_cf_response(body: &Json<AuthSignUpWithEmailPasswordRequest>)
     let response = match response {
         Ok(response) => response,
         Err(_) => {
-            log::debug!("failed to send cf_turnstile_response: {}", body.cf_turnstile_response);
+            log::error!("failed to send cf_turnstile_response: {}", body.cf_turnstile_response);
             return false;
         }
     };
     let cf_text = match response.text().await {
         Ok(text) => text,
         Err(_) => {
-            log::debug!("failed to read cf_turnstile_response: {}", body.cf_turnstile_response);
+            log::error!("failed to read cf_turnstile_response: {}", body.cf_turnstile_response);
             return false;
         }
     };
@@ -75,7 +74,7 @@ pub async fn verify_cf_response(body: &Json<AuthSignUpWithEmailPasswordRequest>)
         Ok(json) => json,
         Err(_) => {
             return {
-                log::debug!("failed to parse cf_turnstile_response: {}", cf_text);
+                log::error!("failed to parse cf_turnstile_response: {}", cf_text);
                 false
             }
         }
@@ -83,7 +82,7 @@ pub async fn verify_cf_response(body: &Json<AuthSignUpWithEmailPasswordRequest>)
     match json {
         SiteVerifyResponse::Success(s) => s.success,
         SiteVerifyResponse::Error(e) => {
-            log::debug!("failed to verify cf_turnstile_response: {:?}", e);
+            log::error!("failed to verify cf_turnstile_response: {:?}", e);
             return false;
         }
     }

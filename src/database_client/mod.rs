@@ -1,5 +1,5 @@
 use chrono::NaiveDateTime;
-use log::debug;
+use log::error;
 use mysql::{
     params,
     prelude::{FromRow, Queryable},
@@ -88,7 +88,7 @@ impl DatabaseClient {
         );
         if insert_user.is_err() {
             let error = insert_user.err().unwrap();
-            debug!("Error creating user: {:?}", error);
+            error!("Error creating user: {:?}", error);
             return Err(error);
         }
         let now = chrono::Utc::now().naive_utc();

@@ -9,7 +9,7 @@ use argon2::{
 };
 use axum::{extract::State, Json};
 use hyper::StatusCode;
-use log::debug;
+use log::error;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
@@ -44,14 +44,14 @@ pub async fn auth_sign_up_with_email_password(state: State<AppState>, json: Json
     // validate cf_turnstile_response
     let ok = verify_cf_response(&json).await;
     if !ok {
-        debug!("cf_turnstile_response failed validation");
+        error!("cf_turnstile_response failed validation");
         return StatusCode::BAD_REQUEST;
     }
     let create_user = CreateUser { email: json.email.clone() };
     // hash the password with crypto crate
     let password_hash = hash_password(json.password.clone());
     if password_hash.is_err() {
-        debug!("password_hash failed to hash");
+        error!("password_hash failed to hash");
         return StatusCode::BAD_REQUEST;
     }
     let password_hash = password_hash.unwrap();
@@ -59,7 +59,7 @@ pub async fn auth_sign_up_with_email_password(state: State<AppState>, json: Json
     let result = state.database_client.create_user_and_user_auth(create_user, create_user_auth);
     if result.is_err() {
         let error = result.err().unwrap();
-        debug!("create_user_and_user_auth failed: {:?}", error);
+        error!("create_user_and_user_auth failed: {:?}", error);
         return StatusCode::BAD_REQUEST;
     }
     StatusCode::OK

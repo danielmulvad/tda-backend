@@ -8,7 +8,7 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 use hyper::StatusCode;
-use log::{debug, error};
+use log::error;
 use serde::{Deserialize, Serialize};
 
 #[derive(Deserialize, Serialize)]
@@ -25,10 +25,7 @@ pub struct AuthRefreshTokenResponse {
 pub async fn auth_tradetracker_refresh_token(jar: CookieJar, State(state): State<AppState>, Json(json): Json<AuthRefreshTokenBody>) -> Result<impl IntoResponse, StatusCode> {
     let refresh_token = json.refresh_token;
     let refresh_token = match exchange_refresh_token(&refresh_token, state.env.jwt_refresh_token_secret.as_str()) {
-        Ok(data) => {
-            debug!("auth_refresh_token data: {:?}", data);
-            data
-        }
+        Ok(data) => data,
         Err(e) => {
             error!("auth_refresh_token error: {}", e);
             return Err(StatusCode::UNAUTHORIZED);

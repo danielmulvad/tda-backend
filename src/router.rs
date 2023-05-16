@@ -26,6 +26,7 @@ impl Router {
     pub fn new(app_state: AppState) -> Self {
         let private_routes = axum::Router::<AppState>::new()
             .route("/get_accounts", get(tda::get_accounts))
+            .route("/:account_id/get_orders", get(tda::get_orders))
             .route("/auth/providers/tda", get(tda::auth::get_authorization_url))
             .route("/auth/providers/tda", post(tda::auth_tda_refresh_token))
             .route("/auth/callback/tda", get(tda::auth::callback::tda))

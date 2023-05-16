@@ -9,7 +9,7 @@ use axum::{
 };
 use axum_extra::extract::CookieJar;
 use hyper::StatusCode;
-use log::{debug, error};
+use log::error;
 
 pub async fn auth_tda_refresh_token(jar: CookieJar, State(state): State<AppState>) -> impl IntoResponse {
     let refresh_token_cookie = jar.get("refresh_token_tda");
@@ -18,10 +18,7 @@ pub async fn auth_tda_refresh_token(jar: CookieJar, State(state): State<AppState
         None => return (StatusCode::UNAUTHORIZED, jar, Json(TokenResponse::default())),
     };
     let token_response = match state.tda_client.exchange_refresh_token_for_token(&refresh_token).await {
-        Ok(data) => {
-            debug!("auth_refresh_token data: {:?}", data);
-            data
-        }
+        Ok(data) => data,
         Err(e) => {
             error!("auth_refresh_token error: {}", e);
             return (StatusCode::INTERNAL_SERVER_ERROR, jar, Json(TokenResponse::default()));
